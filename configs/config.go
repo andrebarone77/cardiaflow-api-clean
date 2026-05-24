@@ -16,6 +16,9 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	DBSSLMode  string
+
+	JWTSecret    string
+	JWTExpiresIn string
 }
 
 func Load() *Config {
@@ -27,12 +30,14 @@ func Load() *Config {
 	}
 
 	return &Config{
-		AppPort:    os.Getenv("APP_PORT"),
-		DBHost:     os.Getenv("DB_HOST"),
-		DBPort:     os.Getenv("DB_PORT"),
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBName:     os.Getenv("DB_NAME"),
-		DBSSLMode:  os.Getenv("DB_SSLMODE"),
+		AppPort:      os.Getenv("APP_PORT"),
+		DBHost:       os.Getenv("DB_HOST"),
+		DBPort:       os.Getenv("DB_PORT"),
+		DBUser:       os.Getenv("DB_USER"),
+		DBPassword:   os.Getenv("DB_PASSWORD"),
+		DBName:       os.Getenv("DB_NAME"),
+		DBSSLMode:    os.Getenv("DB_SSLMODE"),
+		JWTSecret:    os.Getenv("JWT_SECRET"),
+		JWTExpiresIn: os.Getenv("JWT_EXPIRES_IN"),
 	}
 }
