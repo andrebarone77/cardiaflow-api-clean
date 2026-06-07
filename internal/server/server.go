@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/andrebarone77/cardiaflow-api/configs"
+	"github.com/andrebarone77/cardiaflow-api/internal/auth"
 	"github.com/andrebarone77/cardiaflow-api/internal/handler"
 	"github.com/andrebarone77/cardiaflow-api/internal/repository"
 	"github.com/andrebarone77/cardiaflow-api/internal/service"
@@ -40,29 +41,36 @@ func (s *Server) Run() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	login := r.Group("/api/auth")
+	login.POST("/login", authHandler.Login)
+
 	api := r.Group("/api")
+	api.Use(auth.AuthMiddleware())
 	{
-		api.POST("/users", userHandler.Create)
+
 		api.GET("/users", userHandler.Get)
 		api.GET("/users/:id", userHandler.GetById)
 		api.DELETE("/users/:id", userHandler.Delete)
 		api.PATCH("/users/:id", userHandler.Update)
 
-		api.POST("/healthrecordtypes", healthRecordTypeHandler.Create)
 		api.GET("/healthrecordtypes", healthRecordTypeHandler.GetAll)
 		api.GET("/healthrecordtypes/:id", healthRecordTypeHandler.GetByID)
 		api.GET("/healthrecordtypes/code/:code", healthRecordTypeHandler.GetByCode)
 		api.DELETE("/healthrecordtypes", healthRecordTypeHandler.Delete)
 		api.PATCH("/healthrecordtypes/:id", healthRecordTypeHandler.Update)
 
-		api.POST("/healthrecord", healthRecordHandler.Create)
 		api.GET("/healthrecord/:id", healthRecordHandler.GetByID)
 		api.GET("/healthrecord/list", healthRecordHandler.ListByUserID)
 		api.DELETE("/healthrecord", healthRecordHandler.Delete)
 		api.PATCH("/healthrecord/:id", healthRecordHandler.Update)
 
-		api.POST("/auth/login", authHandler.Login)
+	}
 
+	create := r.Group("/api")
+	{
+		create.POST("/users", userHandler.Create)
+		create.POST("/healthrecordtypes", healthRecordTypeHandler.Create)
+		create.POST("/healthrecord", healthRecordHandler.Create)
 	}
 
 	r.GET("/ping", func(ctx *gin.Context) {
