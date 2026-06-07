@@ -37,6 +37,9 @@ func (s *Server) Run() {
 	healthRecordService := service.NewHealthRecordService(healthRecordRepo)
 	healthRecordHandler := handler.NewHealthRecordHandler(healthRecordService)
 
+	authService := service.NewAuthService(userRepo)
+	authHandler := handler.NewAuthHandler(authService)
+
 	api := r.Group("/api")
 	{
 		api.POST("/users", userHandler.Create)
@@ -57,6 +60,8 @@ func (s *Server) Run() {
 		api.GET("/healthrecord/list", healthRecordHandler.ListByUserID)
 		api.DELETE("/healthrecord", healthRecordHandler.Delete)
 		api.PATCH("/healthrecord/:id", healthRecordHandler.Update)
+
+		api.POST("/auth/login", authHandler.Login)
 
 	}
 

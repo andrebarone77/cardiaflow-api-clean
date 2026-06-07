@@ -56,10 +56,10 @@ func (r *userRepository) Save(ctx context.Context, user *domain.User) error {
 
 }
 
-func (r *userRepository) Get(ctx context.Context, email string) (*domain.User, error) {
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user := &domain.User{}
 	query := `
-		SELECT id, name, email
+		SELECT id, name, email, password_hash
 		FROM users
 		WHERE email = $1
 	`
@@ -70,6 +70,7 @@ func (r *userRepository) Get(ctx context.Context, email string) (*domain.User, e
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.PasswordHash,
 	)
 
 	if errors.Is(err, sql.ErrNoRows) {

@@ -51,7 +51,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 func (h *UserHandler) Get(c *gin.Context) {
 	email := strings.ToLower(strings.TrimSpace(c.Query("email")))
 
-	user, err := h.userService.Get(c.Request.Context(), email)
+	user, err := h.userService.GetByEmail(c.Request.Context(), email)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {

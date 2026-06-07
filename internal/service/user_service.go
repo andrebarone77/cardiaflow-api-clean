@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	Save(ctx context.Context, user *domain.User) error
-	Get(ctx context.Context, email string) (*domain.User, error)
+	GetByEmail(ctx context.Context, email string) (*domain.User, error)
 	GetById(ctx context.Context, id string) (*domain.User, error)
 	Delete(ctx context.Context, id string) error
 }
@@ -46,9 +46,9 @@ func (s *UserService) Create(ctx context.Context, req servicedto.CreateUserInput
 	return user, nil
 }
 
-func (s *UserService) Get(ctx context.Context, email string) (*domain.User, error) {
+func (s *UserService) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 
-	user, err := s.repo.Get(ctx, email)
+	user, err := s.repo.GetByEmail(ctx, email)
 
 	if err != nil {
 		return nil, err
