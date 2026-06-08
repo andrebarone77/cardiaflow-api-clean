@@ -77,28 +77,32 @@ CREATE TABLE health_records (
 ``` 
 
 
-Main Endpoints
+# Main Endpoints
 
     [POST] /api/auth/login - login
 
     [POST] /users - create user
-    [GET] /users - get user by email **[jwt]**
-    [GET] /users/:id - get user by id **[jwt]**
-    [DELETE] /users/:id - delete user **[jwt]**
-    [PATCH] /users/:id - update user **[jwt]**
+    [GET] /users - get user by email [jwt]
+    [GET] /users/:id - get user by id [jwt]
+    [DELETE] /users/:id - delete user [jwt]
+    [PATCH] /users/:id - update user [jwt]
 
     [POST] /healthrecordtypes - create health record type
-    [GET] /healthrecordtypes - get all health record types **[jwt]**
-    [GET] /healthrecordtypes/:id - get health record type by id **[jwt]**
-    [GET] /healthrecordtypes/code/:code - get health record type by code **[jwt]**
-    [DELETE] /healthrecordtypes- delete health record type **[jwt]**
-    [PATCH] /healthrecordtypes/:id - update health record type **[jwt]**
+    [GET] /healthrecordtypes - get all health record types [jwt]
+    [GET] /healthrecordtypes/:id - get health record type by id [jwt]
+    [GET] /healthrecordtypes/code/:code - get health record type by code [jwt]
+    [DELETE] /healthrecordtypes- delete health record type [jwt]
+    [PATCH] /healthrecordtypes/:id - update health record type [jwt]
 
     [POST] /healthrecord - create health record 
-    [GET] /healthrecord/:id - get health record type by id **[jwt]**
-    [GET] /healthrecord/list- get health record list by user id **[jwt]**
-    [DELETE] /healthrecord- delete health record **[jwt]**
-    [PATCH] /healthrecord/:id - update health record **[jwt]**
+    [GET] /healthrecord/:id - get health record type by id [jwt]
+    [GET] /healthrecord/list- get health record list by user id [jwt]
+    [DELETE] /healthrecord- delete health record [jwt]
+    [PATCH] /healthrecord/:id - update health record [jwt]
 
 
-Roadmap
+# Roadmap
+    - [ ] User Role and permissions
+    - [ ] Unit Tests
+    - [ ] Swagger documentation
+    - [ ] Frontend application
