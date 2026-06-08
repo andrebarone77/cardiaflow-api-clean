@@ -1,9 +1,9 @@
 # Cardiaflow API
 
-Cardiaflow is an API intended to provide support to health data for individuals.
+Cardiaflow is a REST API for storing and managing personal health records such as weight, blood pressure, glucose levels and other health metrics.
 
 
-Development:
+## Development:
 - Golang with [Gin Web Framework](https://gin-gonic.com/)
 - PostgreSQL
 - JWT authentication
