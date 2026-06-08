@@ -49,7 +49,7 @@ ON health_record_types (LOWER(TRIM(code)));
 
 CREATE UNIQUE INDEX users_email_unique
 ON users (LOWER(email));
---Ativa a extensão UUID:
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 ```
 ```sql
@@ -76,11 +76,11 @@ CREATE TABLE health_records (
         CHECK (notes IS NULL OR length(trim(notes)) > 0)
 );    
 ``` 
-### Enviroment Example
+### Enviroment Example (.env)
 ```
 APP_PORT=8080
 
-DB_HOST=<host ip or name>
+DB_HOST=<host_ip or name>
 DB_PORT=5433
 DB_USER=<dbuser>
 DB_PASSWORD=<dbpassword>
