@@ -9,8 +9,8 @@ Development:
 - JWT authentication
 
 
-Configuração
-- Install go language:  
+## Configuração
+### Install go language:  
     Linux Ubuntu:   
     sudo snap install go --classic  
 
@@ -23,7 +23,7 @@ Configuração
     Test with go version.
 
 
-# Database Setup
+## Database Setup
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,7 +77,7 @@ CREATE TABLE health_records (
 ``` 
 
 
-# Main Endpoints
+## Main Endpoints
 
     [POST] /api/auth/login - login
 
@@ -101,7 +101,7 @@ CREATE TABLE health_records (
     [PATCH] /healthrecord/:id - update health record [jwt]
 
 
-# Roadmap
+## Roadmap
     - [ ] User Role and permissions
     - [ ] Unit Tests
     - [ ] Swagger documentation
