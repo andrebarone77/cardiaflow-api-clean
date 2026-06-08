@@ -10,7 +10,7 @@ Development:
 
 
 ## Configuração
-### Install go language:  
+### Install go language  
     Linux Ubuntu:   
     sudo snap install go --classic  
 
@@ -23,7 +23,8 @@ Development:
     Test with go version.
 
 
-## Database Setup
+### Database Setup
+
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -75,7 +76,20 @@ CREATE TABLE health_records (
         CHECK (notes IS NULL OR length(trim(notes)) > 0)
 );    
 ``` 
+### Enviroment Example
+```
+APP_PORT=8080
 
+DB_HOST=<host ip or name>
+DB_PORT=5433
+DB_USER=<dbuser>
+DB_PASSWORD=<dbpassword>
+DB_NAME=cardiaflow
+DB_SSLMODE=disable
+
+JWT_SECRET=<jwtsecret>
+JWT_EXPIRES_IN=2h
+```
 
 ## Main Endpoints
 
