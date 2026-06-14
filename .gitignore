@@ -1,3 +1,5 @@
 **/__debug*
 **/.env
 **/.vscode
+**/build/cardiaflow
+coverage.out
