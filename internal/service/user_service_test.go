@@ -9,10 +9,6 @@ import (
 	servicedto "github.com/andrebarone77/cardiaflow-api/internal/service/dto"
 )
 
-const UUID_NOT_FOUND = "c21a1e3b-925a-4eeb-af38-5a2945e1693d"
-const UUID_OK = "a9b7cb29-282f-4d70-96e8-94d987ddc333"
-const UUID_SAVE_ERRROR = "4a71a96f-c029-4b51-a7eb-a3b5137b035a"
-
 type MockUserRepository struct {
 	SaveFn       func(ctx context.Context, user *domain.User) error
 	GetByEmailFn func(ctx context.Context, email string) (*domain.User, error)
@@ -168,7 +164,7 @@ func TestUserService_GetUserById(t *testing.T) {
 	}{
 		{
 			test_name:     "success",
-			id:            UUID_OK,
+			id:            HEALTH_RECORD_NAME_OK,
 			expects_error: false,
 		},
 		{
@@ -232,7 +228,7 @@ func TestUserService_Update(t *testing.T) {
 	}{
 		{
 			test_name:     "Sucess",
-			id:            UUID_OK,
+			id:            HEALTH_RECORD_NAME_OK,
 			name:          "Andre",
 			email:         "andre@email.com",
 			password:      "password123",
@@ -317,7 +313,7 @@ func TestUserService_Delete(t *testing.T) {
 	}{
 		{
 			test_name:             "Sucess",
-			id:                    UUID_OK,
+			id:                    HEALTH_RECORD_NAME_OK,
 			expects_delete_called: true,
 			expect_error:          false,
 		},
