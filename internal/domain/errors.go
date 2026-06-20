@@ -16,6 +16,7 @@ var ErrHealthRecordTypeImmutable = errors.New("health record type can not be mod
 var ErrNoInformation = errors.New("no information provided")
 var ErrInternalServer = errors.New("database internal server error")
 var ErrEmptyId = errors.New("id not provided")
+var ErrMissingAttribute = errors.New("Missing Attribute")
 
 var ErrCodeRequired = errors.New("code attribute is required")
 var ErrCodeTooLong = errors.New("code attribute is too long (limit 50)")

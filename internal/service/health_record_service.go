@@ -27,6 +27,10 @@ type HealthRecordService struct {
 
 func (s *HealthRecordService) Create(ctx context.Context, healthRecordInput servicedto.HealthRecordCreateInput) (string, error) {
 
+	if isMissingAttribute(healthRecordInput) {
+		return "", domain.ErrMissingAttribute
+	}
+
 	healthRecord := &domain.HealthRecord{
 		UserID:             *healthRecordInput.UserID,
 		HealthRecordTypeID: *healthRecordInput.HealthRecordTypeID,
@@ -55,21 +59,21 @@ func (s *HealthRecordService) GetByID(ctx context.Context, id string) (*domain.H
 
 }
 
-func (s *HealthRecordService) Update(ctx context.Context, id string, update servicedto.HealthRecordUpdateInput) error {
+func (s *HealthRecordService) Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error {
 
 	healthRecord, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if update.Value != nil {
-		healthRecord.Value = *update.Value
+	if update_input.Value != nil {
+		healthRecord.Value = *update_input.Value
 	}
-	if update.Notes != nil {
-		healthRecord.Notes = update.Notes
+	if update_input.Notes != nil {
+		healthRecord.Notes = update_input.Notes
 	}
-	if update.RecordedAt != nil {
-		healthRecord.RecordedAt = *update.RecordedAt
+	if update_input.RecordedAt != nil {
+		healthRecord.RecordedAt = *update_input.RecordedAt
 	}
 
 	err = s.repo.Update(ctx, healthRecord.ID, healthRecord)
@@ -89,4 +93,15 @@ func (s *HealthRecordService) ListByUserID(ctx context.Context, userId string) (
 
 func (s *HealthRecordService) Delete(ctx context.Context, id string) error {
 	return s.repo.Delete(ctx, id)
+}
+
+func isMissingAttribute(healthRecordInput servicedto.HealthRecordCreateInput) bool {
+	if healthRecordInput.UserID == nil ||
+		healthRecordInput.HealthRecordTypeID == nil ||
+		healthRecordInput.Value == nil ||
+		healthRecordInput.Notes == "" {
+		return true
+	}
+
+	return false
 }
