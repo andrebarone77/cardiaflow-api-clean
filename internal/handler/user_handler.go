@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strings"
@@ -9,16 +10,23 @@ import (
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	handlerdto "github.com/andrebarone77/cardiaflow-api/internal/handler/dto"
-	"github.com/andrebarone77/cardiaflow-api/internal/service"
 	"github.com/andrebarone77/cardiaflow-api/internal/service/dto"
 	servicedto "github.com/andrebarone77/cardiaflow-api/internal/service/dto"
 )
 
-type UserHandler struct {
-	userService *service.UserService
+type UserService interface {
+	Create(ctx context.Context, req servicedto.CreateUserInput) (*domain.User, error)
+	GetByEmail(ctx context.Context, email string) (*domain.User, error)
+	GetById(ctx context.Context, id string) (*domain.User, error)
+	Delete(ctx context.Context, id string) error
+	Update(ctx context.Context, id string, req servicedto.UpdateUserInput) (*domain.User, error)
 }
 
-func NewUserHandler(userService *service.UserService) *UserHandler {
+type UserHandler struct {
+	userService UserService
+}
+
+func NewUserHandler(userService UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
@@ -51,6 +59,10 @@ func (h *UserHandler) Create(c *gin.Context) {
 func (h *UserHandler) Get(c *gin.Context) {
 	email := strings.ToLower(strings.TrimSpace(c.Query("email")))
 
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing email"})
+		return
+	}
 	user, err := h.userService.GetByEmail(c.Request.Context(), email)
 
 	if err != nil {
@@ -74,8 +86,8 @@ func (h *UserHandler) GetById(c *gin.Context) {
 	user, err := h.userService.GetById(c.Request.Context(), id)
 
 	if err != nil {
-		if errors.Is(err, domain.ErrHealthRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": domain.ErrHealthRecordNotFound.Error()})
+		if errors.Is(err, domain.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": domain.ErrUserNotFound.Error()})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
