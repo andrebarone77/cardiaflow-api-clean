@@ -1,21 +1,30 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	handlerdto "github.com/andrebarone77/cardiaflow-api/internal/handler/dto"
-	"github.com/andrebarone77/cardiaflow-api/internal/service"
 	servicedto "github.com/andrebarone77/cardiaflow-api/internal/service/dto"
 	"github.com/gin-gonic/gin"
 )
 
-type HealthRecordTypeHandler struct {
-	healthRecordTypeService *service.HealthRecordTypeService
+type HealthRecordTypeService interface {
+	Create(ctx context.Context, input servicedto.HealthRecordTypeInput) (string, error)
+	GetByID(ctx context.Context, id string) (*domain.HealthRecordType, error)
+	GetByCode(ctx context.Context, code string) (*domain.HealthRecordType, error)
+	GetAll(ctx context.Context) ([]*domain.HealthRecordType, error)
+	Delete(ctx context.Context, id string) error
+	Update(ctx context.Context, id string, update servicedto.HealthRecordTypeUpdateInput) (*domain.HealthRecordType, error)
 }
 
-func NewHealthRecordTypeHandler(service *service.HealthRecordTypeService) *HealthRecordTypeHandler {
+type HealthRecordTypeHandler struct {
+	healthRecordTypeService HealthRecordTypeService
+}
+
+func NewHealthRecordTypeHandler(service HealthRecordTypeService) *HealthRecordTypeHandler {
 	return &HealthRecordTypeHandler{healthRecordTypeService: service}
 }
 

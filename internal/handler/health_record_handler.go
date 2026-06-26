@@ -1,21 +1,29 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	handlerdto "github.com/andrebarone77/cardiaflow-api/internal/handler/dto"
-	"github.com/andrebarone77/cardiaflow-api/internal/service"
 	servicedto "github.com/andrebarone77/cardiaflow-api/internal/service/dto"
 	"github.com/gin-gonic/gin"
 )
 
-type HealthRecordHandler struct {
-	healthRecordService *service.HealthRecordService
+type HealthRecordService interface {
+	Create(ctx context.Context, healthRecordInput servicedto.HealthRecordCreateInput) (string, error)
+	GetByID(ctx context.Context, id string) (*domain.HealthRecord, error)
+	Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error
+	ListByUserID(ctx context.Context, userId string) ([]*domain.HealthRecord, error)
+	Delete(ctx context.Context, id string) error
 }
 
-func NewHealthRecordHandler(service *service.HealthRecordService) *HealthRecordHandler {
+type HealthRecordHandler struct {
+	healthRecordService HealthRecordService
+}
+
+func NewHealthRecordHandler(service HealthRecordService) *HealthRecordHandler {
 	return &HealthRecordHandler{healthRecordService: service}
 }
 
@@ -70,6 +78,10 @@ func (h *HealthRecordHandler) Update(c *gin.Context) {
 
 func (h *HealthRecordHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing record id"})
+		return
+	}
 
 	healthRecord, err := h.healthRecordService.GetByID(c.Request.Context(), id)
 
@@ -90,7 +102,7 @@ func (h *HealthRecordHandler) ListByUserID(c *gin.Context) {
 	userID := c.Query("user_id")
 
 	if userID == "" {
-		c.JSON(http.StatusOK, gin.H{"error": domain.ErrorUserIDNotProvided})
+		c.JSON(http.StatusBadRequest, gin.H{"error": domain.ErrorUserIDNotProvided})
 		return
 	}
 
@@ -102,7 +114,7 @@ func (h *HealthRecordHandler) ListByUserID(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -130,7 +142,7 @@ func (h *HealthRecordHandler) Delete(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

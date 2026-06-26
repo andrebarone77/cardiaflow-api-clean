@@ -120,3 +120,13 @@ JWT_EXPIRES_IN=2h
     - [ ] Unit Tests
     - [ ] Swagger documentation
     - [ ] Frontend application
+
+## Useful
+### To Run Tests and show coverage by function:
+```
+go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
+```
+### To Run Tests and show covarage in HTML:
+```
+go test ./internal/handler/ -coverprofile=coverage.out && go tool cover -html=coverage.out
+```
