@@ -22,11 +22,8 @@ type Config struct {
 }
 
 func Load() *Config {
-	err := godotenv.Load()
-
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		log.Println(".env file not found. Check example ./env_example")
-		return nil
 	}
 
 	return &Config{
