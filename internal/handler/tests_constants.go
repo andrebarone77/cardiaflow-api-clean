@@ -18,3 +18,5 @@ const ID_NOT_FOUND = "3977f63b-86fe-44b8-8ff9-83261b212661"
 const ID_EMPTY_RETURN = "bf0816e9-28d7-41c4-a2f9-f9e0a7160a73"
 
 const ID_IMMUTABLE = "dc8424bb-84d4-4660-bcb5-95ae5f91074b"
+
+const EMAIL_NOT_AUTHORIZED = "email@notauthorized.com"

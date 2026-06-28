@@ -1,0 +1,450 @@
+=== RUN   TestAuthHandler_Login
+=== RUN   TestAuthHandler_Login/Test_Ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestAuthHandler_Login (0.00s)
+    --- PASS: TestAuthHandler_Login/Test_Ok (0.00s)
+=== RUN   TestHealthRecord_Create
+=== RUN   TestHealthRecord_Create/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Create/Test_Invalid_ID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Create/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Create/Test_Invalid_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealthRecord_Create (0.00s)
+    --- PASS: TestHealthRecord_Create/Test_OK (0.00s)
+    --- PASS: TestHealthRecord_Create/Test_Invalid_ID (0.00s)
+    --- PASS: TestHealthRecord_Create/Test_Generic_Error (0.00s)
+    --- PASS: TestHealthRecord_Create/Test_Invalid_Body (0.00s)
+=== RUN   TestHealthRecord_Update
+=== RUN   TestHealthRecord_Update/Test_Ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Update/Test_Missing_ID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Update/Test_Malformed_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Update/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_Update/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealthRecord_Update (0.00s)
+    --- PASS: TestHealthRecord_Update/Test_Ok (0.00s)
+    --- PASS: TestHealthRecord_Update/Test_Missing_ID (0.00s)
+    --- PASS: TestHealthRecord_Update/Test_Malformed_Body (0.00s)
+    --- PASS: TestHealthRecord_Update/Test_Not_Found (0.00s)
+    --- PASS: TestHealthRecord_Update/Test_Generic_Error (0.00s)
+=== RUN   TestHealhRecordType_GetById
+=== RUN   TestHealhRecordType_GetById/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordType_GetById/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordType_GetById/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordType_GetById/Test_missing_Id
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealhRecordType_GetById (0.00s)
+    --- PASS: TestHealhRecordType_GetById/Test_OK (0.00s)
+    --- PASS: TestHealhRecordType_GetById/Test_Not_Found (0.00s)
+    --- PASS: TestHealhRecordType_GetById/Test_Generic_Error (0.00s)
+    --- PASS: TestHealhRecordType_GetById/Test_missing_Id (0.00s)
+=== RUN   TestHealthRecord_ListByUserID
+=== RUN   TestHealthRecord_ListByUserID/Test_Ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_ListByUserID/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_ListByUserID/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_ListByUserID/Test_Generic_Error#01
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthRecord_ListByUserID/Test_Empty_UserID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealthRecord_ListByUserID (0.00s)
+    --- PASS: TestHealthRecord_ListByUserID/Test_Ok (0.00s)
+    --- PASS: TestHealthRecord_ListByUserID/Test_Not_Found (0.00s)
+    --- PASS: TestHealthRecord_ListByUserID/Test_Generic_Error (0.00s)
+    --- PASS: TestHealthRecord_ListByUserID/Test_Generic_Error#01 (0.00s)
+    --- PASS: TestHealthRecord_ListByUserID/Test_Empty_UserID (0.00s)
+=== RUN   TestHandlerRecord_Delete
+=== RUN   TestHandlerRecord_Delete/Test_Ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHandlerRecord_Delete/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHandlerRecord_Delete/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHandlerRecord_Delete/Test_No_ID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHandlerRecord_Delete (0.00s)
+    --- PASS: TestHandlerRecord_Delete/Test_Ok (0.00s)
+    --- PASS: TestHandlerRecord_Delete/Test_Not_Found (0.00s)
+    --- PASS: TestHandlerRecord_Delete/Test_Generic_Error (0.00s)
+    --- PASS: TestHandlerRecord_Delete/Test_No_ID (0.00s)
+=== RUN   TestHealhRecordTypeHandler_Create
+=== RUN   TestHealhRecordTypeHandler_Create/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_Malformed_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_Code_Required
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_Code_Already_Exists
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_Code_Too_Long
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_OK#01
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Create/Test_OK#02
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealhRecordTypeHandler_Create (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_OK (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_Malformed_Body (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_Code_Required (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_Code_Already_Exists (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_Code_Too_Long (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_OK#01 (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Create/Test_OK#02 (0.00s)
+=== RUN   TestHealhRecordTypeHandler_GetById
+=== RUN   TestHealhRecordTypeHandler_GetById/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_GetById/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_GetById/Test_OK#01
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealhRecordTypeHandler_GetById (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_GetById/Test_OK (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_GetById/Test_Not_Found (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_GetById/Test_OK#01 (0.00s)
+=== RUN   TestHealthRecordType_GetByCode
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealthRecordType_GetByCode (0.00s)
+=== RUN   TestHealhRecordTypeHandler_GetAll
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealhRecordTypeHandler_GetAll (0.00s)
+=== RUN   TestHealthHandlerType_Update
+=== RUN   TestHealthHandlerType_Update/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_HealthRecordType_Already_Exists
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_HealthRecordType_Immutable
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_HealthRecordType_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_No_Id
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_No_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealthHandlerType_Update/Test_Malformed_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealthHandlerType_Update (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_OK (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_Not_Found (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_HealthRecordType_Already_Exists (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_HealthRecordType_Immutable (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_HealthRecordType_Generic_Error (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_No_Id (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_No_Body (0.00s)
+    --- PASS: TestHealthHandlerType_Update/Test_Malformed_Body (0.00s)
+=== RUN   TestHealhRecordTypeHandler_Delete
+=== RUN   TestHealhRecordTypeHandler_Delete/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Delete/Test_NotFound
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestHealhRecordTypeHandler_Delete/Test_Immutable
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHealhRecordTypeHandler_Delete (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Delete/Test_OK (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Delete/Test_NotFound (0.00s)
+    --- PASS: TestHealhRecordTypeHandler_Delete/Test_Immutable (0.00s)
+=== RUN   TestUserHandler_Create
+=== RUN   TestUserHandler_Create/Test_ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Create/Test_missing_name
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Create/Test_email_exists
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Create/Test_Other_error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestUserHandler_Create (0.00s)
+    --- PASS: TestUserHandler_Create/Test_ok (0.00s)
+    --- PASS: TestUserHandler_Create/Test_missing_name (0.00s)
+    --- PASS: TestUserHandler_Create/Test_email_exists (0.00s)
+    --- PASS: TestUserHandler_Create/Test_Other_error (0.00s)
+=== RUN   TestUserHandler_Get
+=== RUN   TestUserHandler_Get/Test_OK
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Get/Test_Missing_Email
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Get/Test_Email_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Get/Test_Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestUserHandler_Get (0.00s)
+    --- PASS: TestUserHandler_Get/Test_OK (0.00s)
+    --- PASS: TestUserHandler_Get/Test_Missing_Email (0.00s)
+    --- PASS: TestUserHandler_Get/Test_Email_Not_Found (0.00s)
+    --- PASS: TestUserHandler_Get/Test_Generic_Error (0.00s)
+=== RUN   TestUserHandler_GetByID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestUserHandler_GetByID (0.00s)
+=== RUN   TestUserHandler_Delete
+=== RUN   TestUserHandler_Delete/Test_ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Delete/ID_not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Delete/ID_not_Found#01
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestUserHandler_Delete (0.00s)
+    --- PASS: TestUserHandler_Delete/Test_ok (0.00s)
+    --- PASS: TestUserHandler_Delete/ID_not_Found (0.00s)
+    --- PASS: TestUserHandler_Delete/ID_not_Found#01 (0.00s)
+=== RUN   TestUserHandler_Update
+=== RUN   TestUserHandler_Update/Test_Ok
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_ID_Not_Found
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_No_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_Malformed_Body
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_No_ID
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_update_id
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Test_Email_Already_Exists
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+=== RUN   TestUserHandler_Update/Generic_Error
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestUserHandler_Update (0.00s)
+    --- PASS: TestUserHandler_Update/Test_Ok (0.00s)
+    --- PASS: TestUserHandler_Update/Test_ID_Not_Found (0.00s)
+    --- PASS: TestUserHandler_Update/Test_No_Body (0.00s)
+    --- PASS: TestUserHandler_Update/Test_Malformed_Body (0.00s)
+    --- PASS: TestUserHandler_Update/Test_No_ID (0.00s)
+    --- PASS: TestUserHandler_Update/Test_update_id (0.00s)
+    --- PASS: TestUserHandler_Update/Test_Email_Already_Exists (0.00s)
+    --- PASS: TestUserHandler_Update/Generic_Error (0.00s)
+PASS
+ok  	github.com/andrebarone77/cardiaflow-api/internal/handler	(cached)
