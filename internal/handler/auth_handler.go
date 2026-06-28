@@ -1,19 +1,23 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	handlerdto "github.com/andrebarone77/cardiaflow-api/internal/handler/dto"
-	"github.com/andrebarone77/cardiaflow-api/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type AuthHandler struct {
-	authService *service.AuthService
+type AuthService interface {
+	Login(ctx context.Context, email string, password string) (string, error)
 }
 
-func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+type AuthHandler struct {
+	authService AuthService
+}
+
+func NewAuthHandler(authService AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
 	}

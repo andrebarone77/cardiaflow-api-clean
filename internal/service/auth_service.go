@@ -8,11 +8,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService struct {
-	repo UserRepository
+type AuthRepository interface {
+	GetByEmail(ctx context.Context, email string) (*domain.User, error)
 }
 
-func NewAuthService(repo UserRepository) *AuthService {
+type AuthService struct {
+	repo AuthRepository
+}
+
+func NewAuthService(repo AuthRepository) *AuthService {
 	return &AuthService{
 		repo: repo,
 	}
@@ -32,6 +36,9 @@ func (s *AuthService) Login(ctx context.Context, email string, password string) 
 	}
 
 	token, err := auth.GenerateToken(user.ID)
+	if err != nil {
+		return "", err
+	}
 
-	return token, err
+	return token, nil
 }
