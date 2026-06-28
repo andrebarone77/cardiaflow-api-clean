@@ -117,7 +117,7 @@ JWT_EXPIRES_IN=2h
 
 ## Roadmap
     - [ ] User Role and permissions
-    - [ ] Unit Tests
+    - [X] Unit Tests
     - [ ] Swagger documentation
     - [ ] Frontend application
 
