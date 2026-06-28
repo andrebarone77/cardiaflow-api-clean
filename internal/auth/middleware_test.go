@@ -95,3 +95,18 @@ func TestAuthMiddleware_Authorized(t *testing.T) {
 			w.Code)
 	}
 }
+
+func TestGenerateToken(t *testing.T) {
+	t.Setenv("JWT_SECRET", "test-secret")
+	t.Setenv("JWT_EXPIRES_IN", "1h")
+
+	token, err := GenerateToken("123")
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if token == "" {
+		t.Fatal("expected a token")
+	}
+}
