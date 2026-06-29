@@ -130,3 +130,5 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 ```
 go test ./internal/handler/ -coverprofile=coverage.out && go tool cover -html=coverage.out
 ```
+
+Enjoy It
