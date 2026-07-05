@@ -1,4 +1,93 @@
+basePath: /
+definitions:
+  dto.ErrorResponse:
+    properties:
+      error:
+        example: User not found
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      email:
+        example: andre@email.com
+        type: string
+      id:
+        example: 3dcb50de-a7d4-4d1d-8e78-6c8f1d0e7c4b
+        type: string
+      name:
+        example: Andre Barone
+        type: string
+    type: object
+host: localhost:8080
 info:
-  contact: {}
-paths: {}
+  contact:
+    email: andrebarone77@gmail.com
+    name: André Barone
+    url: https://github.com/andrebarone77
+  description: REST API for managing users and health records.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://github.com/andrebarone77/cardiaflow-api
+  title: Cardiaflow API
+  version: "1.0"
+paths:
+  /api/users/{id}:
+    delete:
+      description: Delete a User by its UUID
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user by ID
+      tags:
+      - Users
+    get:
+      description: Returns a user from its UUID
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

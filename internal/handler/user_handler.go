@@ -80,6 +80,18 @@ func (h *UserHandler) Get(c *gin.Context) {
 
 }
 
+// GetById godoc
+//
+// @Summary      Get user by ID
+// @Description  Returns a user from its UUID
+// @Tags         Users
+// @Security     BearerAuth
+// @Produce      json
+// @Param        id path string true "User UUID"
+// @Success      200 {object} dto.UserResponse
+// @Failure      404 {object} dto.ErrorResponse
+// @Failure      500 {object} dto.ErrorResponse
+// @Router       /api/users/{id} [get]
 func (h *UserHandler) GetById(c *gin.Context) {
 	id := c.Param("id")
 
@@ -87,19 +99,41 @@ func (h *UserHandler) GetById(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": domain.ErrUserNotFound.Error()})
+			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{
+				Error: domain.ErrUserNotFound.Error(),
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		c.JSON(http.StatusInternalServerError, handlerdto.ErrorResponse{
+			Error: err.Error(),
+		})
+
 		return
+
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id": user.ID,
-		"name":  user.Name,
-		"email": user.Email})
+	response := handlerdto.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	c.JSON(http.StatusOK, response)
 
 }
 
+// Delete godoc
+//
+// @Summary      Delete user by ID
+// @Description  Delete a User by its UUID
+// @Tags         Users
+// @Security     BearerAuth
+// @Param        id path string true "User UUID"
+// @Success      204
+// @Failure      404 {object} dto.ErrorResponse
+// @Failure      500 {object} dto.ErrorResponse
+// @Router       /api/users/{id} [delete]
 func (h *UserHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
@@ -107,12 +141,20 @@ func (h *UserHandler) Delete(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": domain.ErrUserNotFound.Error()})
+			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{
+				Error: domain.ErrUserNotFound.Error(),
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+
+		c.JSON(http.StatusInternalServerError, handlerdto.ErrorResponse{
+			Error: err.Error(),
+		})
+
 		return
+
 	}
+
 	c.Status(http.StatusNoContent)
 }
 

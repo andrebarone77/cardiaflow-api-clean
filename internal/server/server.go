@@ -12,7 +12,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "cardiaflow-api/docs"
+	_ "github.com/andrebarone77/cardiaflow-api/docs"
 )
 
 type Server struct {
