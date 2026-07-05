@@ -6,6 +6,22 @@ definitions:
         example: User not found
         type: string
     type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
   dto.UserResponse:
     properties:
       email:
@@ -30,8 +46,38 @@ info:
     url: https://opensource.org/licenses/MIT
   termsOfService: https://github.com/andrebarone77/cardiaflow-api
   title: Cardiaflow API
-  version: "1.0"
+  version: 1.0.0
 paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Authenticate user
+      tags:
+      - Authentication
   /api/users/{id}:
     delete:
       description: Delete a User by its UUID

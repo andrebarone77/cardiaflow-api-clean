@@ -18,7 +18,3 @@ type UserResponse struct {
 	Name  string `json:"name" example:"Andre Barone"`
 	Email string `json:"email" example:"andre@email.com"`
 }
-
-type ErrorResponse struct {
-	Error string `json:"error" example:"User not found"`
-}
