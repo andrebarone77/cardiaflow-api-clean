@@ -11,3 +11,20 @@ type UpdateHealthRecordTypeRequest struct {
 	Code *string `json:"code"`
 	Unit *string `json:"unit"`
 }
+
+type CreateHealthRecordTypeResponse struct {
+	Id string `jason:"id"`
+}
+
+type HealthRecordTypeResponse struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
+
+type HealthRecordTypeUpdateResponse struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+	Unit string `json:"unit"`
+}

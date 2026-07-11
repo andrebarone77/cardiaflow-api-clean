@@ -9,6 +9,10 @@ import (
 	"github.com/andrebarone77/cardiaflow-api/internal/repository"
 	"github.com/andrebarone77/cardiaflow-api/internal/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/andrebarone77/cardiaflow-api/docs"
 )
 
 type Server struct {
@@ -40,6 +44,8 @@ func (s *Server) Run() {
 
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	login := r.Group("/api/auth")
 	login.POST("/login", authHandler.Login)

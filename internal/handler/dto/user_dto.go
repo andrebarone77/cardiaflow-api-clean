@@ -12,3 +12,9 @@ type UpdateUserRequest struct {
 	Password *string `json:"password"`
 	ID       *string `json:"id"`
 }
+
+type UserResponse struct {
+	ID    string `json:"id" example:"3dcb50de-a7d4-4d1d-8e78-6c8f1d0e7c4b"`
+	Name  string `json:"name" example:"Andre Barone"`
+	Email string `json:"email" example:"andre@email.com"`
+}

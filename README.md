@@ -115,11 +115,25 @@ JWT_EXPIRES_IN=2h
     [PATCH] /healthrecord/:id - update health record [jwt]
 
 
+## Fixes
+
+- Minor mapping fixes in Health Record responses
+
 ## Roadmap
     - [ ] User Role and permissions
     - [X] Unit Tests
-    - [ ] Swagger documentation
+    - [X] Swagger documentation
     - [ ] Frontend application
+
+## What's New 
+
+- Added Swagger/OpenAPI documentation
+- Interactive Swagger UI
+- Documented all API endpoints
+- Documented request and response DTOs
+- JWT authentication documentation
+- Added request/response examples
+- General documentation improvements
 
 ## Useful
 ### To Run Tests and show coverage by function:
@@ -129,6 +143,10 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 ### To Run Tests and show covarage in HTML:
 ```
 go test ./internal/handler/ -coverprofile=coverage.out && go tool cover -html=coverage.out
+```
+### Swagger update
+```
+swag init -g cmd/api/main.go
 ```
 
 Enjoy It

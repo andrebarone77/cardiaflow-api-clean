@@ -23,20 +23,42 @@ func NewAuthHandler(authService AuthService) *AuthHandler {
 	}
 }
 
+// Login godoc
+//
+// @Summary      Authenticate user
+// @Description  Authenticates a user and returns a JWT token
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.LoginRequest true "Login credentials"
+// @Success      200 {object} dto.LoginResponse
+// @Failure      401 {object} dto.ErrorResponse
+// @Failure      400 {object} dto.ErrorResponse
+// @Router       /api/auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req handlerdto.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorResponse := handlerdto.ErrorResponse{
+			Error: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, errorResponse)
 		return
 	}
 
-	token, err := h.authService.Login(c.Request.Context(), req.Email, req.Password)
+	token_resp, err := h.authService.Login(c.Request.Context(), req.Email, req.Password)
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": domain.ErrNotAuthorized.Error()})
+		errorResponse := handlerdto.ErrorResponse{
+			Error: domain.ErrNotAuthorized.Error(),
+		}
+		c.JSON(http.StatusUnauthorized, errorResponse)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	loginResponse := handlerdto.LoginResponse{
+		Token: token_resp,
+	}
+
+	c.JSON(http.StatusOK, loginResponse)
 }
