@@ -96,12 +96,15 @@ func (hr *healthRecordRepository) GetByID(ctx context.Context, id string) (*doma
 
 func (hr *healthRecordRepository) ListByUserID(ctx context.Context, userId string) ([]*domain.HealthRecord, error) {
 	query := `
-	SELECT 
+		SELECT
 		id,
-		user_id, 
-		health_record_type_id, 
+		user_id,
+		health_record_type_id,
 		value,
-		notes  
+		recorded_at,
+		notes,
+		created_at,
+		updated_at
 	FROM health_records
 	WHERE user_id = $1
 	`
@@ -114,19 +117,34 @@ func (hr *healthRecordRepository) ListByUserID(ctx context.Context, userId strin
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	var healthRecords []*domain.HealthRecord
 	for rows.Next() {
 		var healthRecord domain.HealthRecord
-		rows.Scan(
+		if err := rows.Scan(
 			&healthRecord.ID,
 			&healthRecord.UserID,
 			&healthRecord.HealthRecordTypeID,
 			&healthRecord.Value,
+			&healthRecord.RecordedAt,
 			&healthRecord.Notes,
-		)
+			&healthRecord.CreatedAt,
+			&healthRecord.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
 		healthRecords = append(healthRecords, &healthRecord)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	{ //TODO: [BAR1] Remover
+		for _, hr := range healthRecords {
+			log.Printf("hr.ID: %s", hr.ID)
+		}
+	}
 	return healthRecords, nil
 }
 

@@ -1,9 +1,101 @@
 basePath: /
 definitions:
+  dto.CreateHealthRecordRequest:
+    properties:
+      health_record_type_id:
+        type: string
+      notes:
+        type: string
+      recorded_at:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: number
+    required:
+    - health_record_type_id
+    - user_id
+    - value
+    type: object
+  dto.CreateHealthRecordTypeRequest:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      unit:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.CreateHealthRecordTypeResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   dto.ErrorResponse:
     properties:
       error:
         example: User not found
+        type: string
+    type: object
+  dto.HealthRecord:
+    properties:
+      created_at:
+        type: string
+      health_record_type_id:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      recorded_at:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: number
+    type: object
+  dto.HealthRecordIdResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  dto.HealthRecordTypeResponse:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.HealthRecordTypeUpdateResponse:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      unit:
         type: string
     type: object
   dto.LoginRequest:
@@ -20,6 +112,24 @@ definitions:
     properties:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  dto.UpdateHealthRecordRequest:
+    properties:
+      notes:
+        type: string
+      recorded_at:
+        type: string
+      value:
+        type: number
+    type: object
+  dto.UpdateHealthRecordTypeRequest:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      unit:
         type: string
     type: object
   dto.UserResponse:
@@ -78,6 +188,425 @@ paths:
       summary: Authenticate user
       tags:
       - Authentication
+  /api/healthrecord:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a Health Record by its ID
+      parameters:
+      - description: Health Record UUID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Health Record By ID
+      tags:
+      - Health Record
+    post:
+      consumes:
+      - application/json
+      description: Creates a new Health Record
+      parameters:
+      - description: Health Record Type data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateHealthRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.HealthRecordIdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Health Record
+      tags:
+      - Health Record
+  /api/healthrecord/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Gets a Health Record by its ID
+      parameters:
+      - description: Health Record UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthRecord'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Health Record By ID
+      tags:
+      - Health Record
+    patch:
+      consumes:
+      - application/json
+      description: Updates a Health Record
+      parameters:
+      - description: Health Record UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Health Record Type data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateHealthRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.HealthRecordIdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Health Record
+      tags:
+      - Health Record
+  /api/healthrecord/list:
+    get:
+      consumes:
+      - application/json
+      description: Lists Health Records by User ID
+      parameters:
+      - description: User UUID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.HealthRecord'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List Health Records by User ID
+      tags:
+      - Health Record
+  /api/healthrecordtypes:
+    get:
+      description: Returns a health record type from its code
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.HealthRecordTypeResponse'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all health record types
+      tags:
+      - Health Record Type
+    post:
+      consumes:
+      - application/json
+      description: Creates a new Health Record Type
+      parameters:
+      - description: Health Record Type data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateHealthRecordTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreateHealthRecordTypeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Health Record Type
+      tags:
+      - Health Record Type
+  /api/healthrecordtypes/{id}:
+    get:
+      description: Returns a health record type from its UUID
+      parameters:
+      - description: Health Record Type UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthRecordTypeResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get health record type by ID
+      tags:
+      - Health Record Type
+    patch:
+      consumes:
+      - application/json
+      description: Update a Health Record Type by ID
+      parameters:
+      - description: Health Record Type UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Health Record Type data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateHealthRecordTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthRecordTypeUpdateResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a Health Record Type by ID
+      tags:
+      - Health Record Type
+  /api/healthrecordtypes/code/{code}:
+    get:
+      description: Returns a health record type from its code
+      parameters:
+      - description: Health Record Type UUID
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthRecordTypeResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get health record type by Code
+      tags:
+      - Health Record Type
+  /api/healthrecordtypes{id}:
+    delete:
+      description: Delete a Health Record Type by ID
+      parameters:
+      - description: Health Record Type UUID
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "209":
+          description: ""
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a Health Record Type by ID
+      tags:
+      - Health Record Type
+  /api/users:
+    get:
+      description: Returns a user from its Email
+      parameters:
+      - description: User e-mail
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by E-mail
+      tags:
+      - Users
+    post:
+      description: Returns created user
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Creates User
+      tags:
+      - Users
   /api/users/{id}:
     delete:
       description: Delete a User by its UUID
