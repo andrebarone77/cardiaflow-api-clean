@@ -156,7 +156,7 @@ info:
     url: https://opensource.org/licenses/MIT
   termsOfService: https://github.com/andrebarone77/cardiaflow-api
   title: Cardiaflow API
-  version: 1.0.0
+  version: 1.1.0
 paths:
   /api/auth/login:
     post:
