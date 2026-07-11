@@ -148,3 +148,5 @@ go test ./internal/handler/ -coverprofile=coverage.out && go tool cover -html=co
 ```
 swag init -g cmd/api/main.go
 ```
+
+Enjoy It
