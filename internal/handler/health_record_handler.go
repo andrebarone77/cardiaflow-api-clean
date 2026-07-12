@@ -135,6 +135,11 @@ func (h *HealthRecordHandler) GetByID(c *gin.Context) {
 		return
 	}
 
+	if healthRecord == nil {
+		c.JSON(http.StatusInternalServerError, handlerdto.ErrorResponse{Error: domain.ErrHealthRecordNotFound.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, toHealthRecordResponse(healthRecord))
 
 }
@@ -241,6 +246,9 @@ func toHealthRecordServiceUpdateInput(req handlerdto.UpdateHealthRecordRequest) 
 }
 
 func toHealthRecordResponse(resp *domain.HealthRecord) handlerdto.HealthRecord {
+	if resp == nil {
+		return handlerdto.HealthRecord{}
+	}
 	return handlerdto.HealthRecord{
 		ID:                 resp.ID,
 		UserID:             resp.UserID,

@@ -59,7 +59,7 @@ func (r *userRepository) Save(ctx context.Context, user *domain.User) error {
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user := &domain.User{}
 	query := `
-		SELECT id, name, email, password_hash
+		SELECT id, name, email, role, password_hash
 		FROM users
 		WHERE email = $1
 	`
@@ -70,6 +70,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Role,
 		&user.PasswordHash,
 	)
 
@@ -87,7 +88,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.
 func (r *userRepository) GetById(ctx context.Context, id string) (*domain.User, error) {
 	user := &domain.User{}
 	query := `
-		SELECT id, name, email, password_hash
+		SELECT id, name, email, role, password_hash
 		FROM users
 		WHERE id = $1
 	`
@@ -98,6 +99,7 @@ func (r *userRepository) GetById(ctx context.Context, id string) (*domain.User, 
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Role,
 		&user.PasswordHash,
 	)
 

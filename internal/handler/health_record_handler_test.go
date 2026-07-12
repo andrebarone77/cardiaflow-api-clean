@@ -55,7 +55,7 @@ func TestHealthRecord_Create(t *testing.T) {
 				errNum = 0
 				return "", errors.New("Generic Errro")
 			}
-			return "", nil
+			return ID_OK, nil
 		},
 	}
 	handler := NewHealthRecordHandler(mockHealthRecordService)
@@ -77,7 +77,7 @@ func TestHealthRecord_Create(t *testing.T) {
 				"recorded_at": "2026-06-25T19:30:00Z"
 			}
 			`,
-			expected_status: http.StatusOK,
+			expected_status: http.StatusCreated,
 			err_num:         0,
 		},
 		{
@@ -264,7 +264,10 @@ func TestHealhRecordType_GetById(t *testing.T) {
 			if id == ID_GENERIC_ERROR {
 				return nil, errors.New("Generic Error")
 			}
-			return nil, nil
+			if id == ID_NIL_RECORD {
+				return nil, nil
+			}
+			return &domain.HealthRecord{}, nil
 		},
 	}
 
@@ -288,6 +291,11 @@ func TestHealhRecordType_GetById(t *testing.T) {
 		{
 			test_name:       "Test Generic Error",
 			id:              ID_GENERIC_ERROR,
+			expected_status: http.StatusInternalServerError,
+		},
+		{
+			test_name:       "Test Generic Error",
+			id:              ID_NIL_RECORD,
 			expected_status: http.StatusInternalServerError,
 		},
 		{

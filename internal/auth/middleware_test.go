@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	"github.com/gin-gonic/gin"
 )
 
@@ -99,8 +100,9 @@ func TestAuthMiddleware_Authorized(t *testing.T) {
 func TestGenerateToken(t *testing.T) {
 	t.Setenv("JWT_SECRET", "test-secret")
 	t.Setenv("JWT_EXPIRES_IN", "1h")
+	role := domain.RoleUser
 
-	token, err := GenerateToken("123")
+	token, err := GenerateToken("123", role)
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
