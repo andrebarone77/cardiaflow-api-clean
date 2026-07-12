@@ -35,7 +35,7 @@ func (s *AuthService) Login(ctx context.Context, email string, password string) 
 		return "", domain.ErrNotAuthorized
 	}
 
-	token, err := auth.GenerateToken(user.ID)
+	token, err := auth.GenerateToken(user.ID, user.Role)
 	if err != nil {
 		return "", err
 	}

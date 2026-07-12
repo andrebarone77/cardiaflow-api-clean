@@ -5,14 +5,16 @@ import (
 	"time"
 
 	"github.com/andrebarone77/cardiaflow-api/configs"
+	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type Claims struct {
+	Role domain.Role `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userID string) (string, error) {
+func GenerateToken(userID string, role domain.Role) (string, error) {
 	cfg := configs.Load()
 
 	now := time.Now()
@@ -23,6 +25,7 @@ func GenerateToken(userID string) (string, error) {
 	}
 
 	claims := Claims{
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   userID,
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
@@ -59,4 +62,8 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+func (c *Claims) UserID() string {
+	return c.Subject
 }

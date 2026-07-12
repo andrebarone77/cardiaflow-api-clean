@@ -29,8 +29,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": domain.ErrNotAuthorized.Error()})
 			return
 		}
-		c.Set("userID", claims.Subject)
+		c.Set("userID", claims.UserID())
+		c.Set("role", claims.Role)
 		c.Next()
-
 	}
 }
