@@ -3,6 +3,7 @@ package domain
 type Role string
 
 const (
-	RoleUser  Role = "USER"
-	RoleAdmin Role = "ADMIN"
+	RoleAdmin   Role = "ADMIN"
+	RoleManager Role = "MANAGER"
+	RoleUser    Role = "USER"
 )

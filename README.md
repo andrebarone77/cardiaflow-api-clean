@@ -115,8 +115,37 @@ JWT_EXPIRES_IN=2h
     [PATCH] /healthrecord/:id - update health record [jwt]
 
 
-## Fixes
+## Roles and Permissions
+```
+User
 
+- Create -> MANAGER and ADMIN
+- Get By Email -> USER (Self), MANAGER and ADMIN
+- Get By ID -> USER (Self), MANAGER and ADMIN
+- Delete another user -> MANAGER and ADMIN
+
+Health Record Type
+
+- Create -> MANAGER and ADMIN
+- Get All -> USER, MANAGER and ADMIN
+- Get by Code -> USER, MANAGER and ADMIN
+- Get by ID -> USER, MANAGER and ADMIN
+- Delete -> MANAGER and ADMIN (only if not in use)
+- Update -> MANAGER and ADMIN
+
+Health Record
+
+Ownership Rule:
+All authenticated users, regardless of role, may access only their own Health Records.
+
+- Create -> USER, MANAGER and ADMIN (own records only)
+- List -> USER, MANAGER and ADMIN (own records only)
+- Get by ID -> USER, MANAGER and ADMIN (own records only)
+- Update -> USER, MANAGER and ADMIN (own records only)
+- Delete -> USER, MANAGER and ADMIN (own records only)
+```
+
+## Fixes
 - Minor mapping fixes in Health Record responses
 
 ## Roadmap
