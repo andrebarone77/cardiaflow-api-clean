@@ -46,7 +46,7 @@ func (s *UserService) Create(ctx context.Context, req servicedto.CreateUserInput
 	return user, nil
 }
 
-func (s *UserService) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (s *UserService) GetByEmail(ctx context.Context, email string, userID string, requesterRole domain.Role) (*domain.User, error) {
 
 	user, err := s.repo.GetByEmail(ctx, email)
 
@@ -54,11 +54,18 @@ func (s *UserService) GetByEmail(ctx context.Context, email string) (*domain.Use
 		return nil, err
 	}
 
+	if requesterRole == domain.RoleUser && user.ID != userID {
+		return nil, domain.ErrForbidden
+	}
+
 	return user, nil
 
 }
 
-func (s *UserService) GetById(ctx context.Context, id string) (*domain.User, error) {
+func (s *UserService) GetById(ctx context.Context, id string, userID string, requesterRole domain.Role) (*domain.User, error) {
+	if requesterRole == domain.RoleUser && id != userID {
+		return nil, domain.ErrForbidden
+	}
 	user, err := s.repo.GetById(ctx, id)
 
 	if err != nil {
@@ -68,14 +75,27 @@ func (s *UserService) GetById(ctx context.Context, id string) (*domain.User, err
 	return user, nil
 }
 
-func (s *UserService) Delete(ctx context.Context, id string) error {
+func (s *UserService) Delete(ctx context.Context, id string, userID string, requesterRole domain.Role) error {
+
+	if requesterRole != domain.RoleAdmin && requesterRole != domain.RoleManager {
+
+		return domain.ErrForbidden
+	}
+
+	if userID == id {
+		return domain.ErrForbidden
+	}
+
 	return s.repo.Delete(ctx, id)
 
 }
 
-func (s *UserService) Update(ctx context.Context, id string, req servicedto.UpdateUserInput) (*domain.User, error) {
+func (s *UserService) Update(ctx context.Context, id string, userId string, requesterRole domain.Role, req servicedto.UpdateUserInput) (*domain.User, error) {
 
-	user, err := s.GetById(ctx, id)
+	if requesterRole == domain.RoleUser && userId != id {
+		return nil, domain.ErrForbidden
+	}
+	user, err := s.GetById(ctx, id, userId, requesterRole)
 
 	if err != nil {
 		return nil, err
