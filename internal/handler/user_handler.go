@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -16,10 +17,10 @@ import (
 
 type UserService interface {
 	Create(ctx context.Context, req servicedto.CreateUserInput) (*domain.User, error)
-	GetByEmail(ctx context.Context, email string) (*domain.User, error)
-	GetById(ctx context.Context, id string) (*domain.User, error)
-	Delete(ctx context.Context, id string) error
-	Update(ctx context.Context, id string, req servicedto.UpdateUserInput) (*domain.User, error)
+	GetByEmail(ctx context.Context, email string, userID string, requesterRole domain.Role) (*domain.User, error)
+	GetById(ctx context.Context, id string, userID string, requesterRole domain.Role) (*domain.User, error)
+	Delete(ctx context.Context, id string, userID string, requesterRole domain.Role) error
+	Update(ctx context.Context, id string, userID string, requesterRole domain.Role, req servicedto.UpdateUserInput) (*domain.User, error)
 }
 
 type UserHandler struct {
@@ -91,13 +92,51 @@ func (h *UserHandler) Get(c *gin.Context) {
 			handlerdto.ErrorResponse{Error: "Missing email"})
 		return
 	}
-	user, err := h.userService.GetByEmail(c.Request.Context(), email)
+
+	id, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	userID, ok := id.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	role, ok := c.Get("role")
+	if !ok {
+		log.Printf("Failed to get role from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterRole, ok := role.(domain.Role)
+	if !ok {
+		log.Printf("Failed to convert role to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	user, err := h.userService.GetByEmail(c.Request.Context(), email, userID, requesterRole)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
 			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{
 				Error: domain.ErrUserNotFound.Error(),
 			})
+			return
+		} else if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden,
+				handlerdto.ErrorResponse{Error: "Forbidden"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError,
@@ -124,9 +163,34 @@ func (h *UserHandler) Get(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/users/{id} [get]
 func (h *UserHandler) GetById(c *gin.Context) {
-	id := c.Param("id")
+	param_id := c.Param("id")
+	id, ok := c.Get("userID")
 
-	user, err := h.userService.GetById(c.Request.Context(), id)
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	userID, ok := id.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	role, ok := c.Get("role")
+	if !ok {
+		log.Printf("Failed to get role from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterRole, ok := role.(domain.Role)
+	user, err := h.userService.GetById(c.Request.Context(), param_id, userID, requesterRole)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
@@ -166,9 +230,34 @@ func (h *UserHandler) GetById(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/users/{id} [delete]
 func (h *UserHandler) Delete(c *gin.Context) {
-	id := c.Param("id")
+	param_id := c.Param("id")
+	id, ok := c.Get("userID")
 
-	err := h.userService.Delete(c.Request.Context(), id)
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	userID, ok := id.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	role, ok := c.Get("role")
+	if !ok {
+		log.Printf("Failed to get role from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterRole, ok := role.(domain.Role)
+	err := h.userService.Delete(c.Request.Context(), param_id, userID, requesterRole)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
@@ -191,10 +280,36 @@ func (h *UserHandler) Delete(c *gin.Context) {
 
 func (h *UserHandler) Update(c *gin.Context) {
 	var req handlerdto.UpdateUserRequest
+	id, ok := c.Get("userID")
 
-	id := c.Param("id")
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
 
-	if len(id) == 0 {
+	userID, ok := id.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	role, ok := c.Get("role")
+	if !ok {
+		log.Printf("Failed to get role from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterRole, ok := role.(domain.Role)
+
+	param_id := c.Param("id")
+
+	if len(param_id) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": domain.ErrEmptyId.Error()})
 		return
 	}
@@ -214,7 +329,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.Update(c.Request.Context(), id, toServiceUpdateInput(req))
+	user, err := h.userService.Update(c.Request.Context(), param_id, userID, requesterRole, toServiceUpdateInput(req))
 
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/andrebarone77/cardiaflow-api/configs"
 	"github.com/andrebarone77/cardiaflow-api/internal/auth"
+	"github.com/andrebarone77/cardiaflow-api/internal/domain"
 	"github.com/andrebarone77/cardiaflow-api/internal/handler"
 	"github.com/andrebarone77/cardiaflow-api/internal/repository"
 	"github.com/andrebarone77/cardiaflow-api/internal/service"
@@ -54,11 +55,6 @@ func (s *Server) Run() {
 	api.Use(auth.AuthMiddleware())
 	{
 
-		api.GET("/users", userHandler.Get)
-		api.GET("/users/:id", userHandler.GetById)
-		api.DELETE("/users/:id", userHandler.Delete)
-		api.PATCH("/users/:id", userHandler.Update)
-
 		api.GET("/healthrecordtypes", healthRecordTypeHandler.GetAll)
 		api.GET("/healthrecordtypes/:id", healthRecordTypeHandler.GetByID)
 		api.GET("/healthrecordtypes/code/:code", healthRecordTypeHandler.GetByCode)
@@ -72,9 +68,18 @@ func (s *Server) Run() {
 
 	}
 
+	users := r.Group("/api")
+	{
+		users.GET("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.Get)
+		users.GET("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.GetById)
+		users.DELETE("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Delete)
+		users.PATCH("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Update)
+		users.POST("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Create)
+	}
+
 	create := r.Group("/api")
 	{
-		create.POST("/users", userHandler.Create)
+
 		create.POST("/healthrecordtypes", healthRecordTypeHandler.Create)
 		create.POST("/healthrecord", healthRecordHandler.Create)
 	}

@@ -3,6 +3,8 @@ package domain
 import "errors"
 
 var ErrNotAuthorized = errors.New("user not authorized")
+var ErrForbidden = errors.New("request forbidden")
+var ErrCouldNotProcessRequest = errors.New("could not process request")
 
 var ErrEmailAlreadyExists = errors.New("email already exists")
 var ErrUserNotFound = errors.New("user not found")
