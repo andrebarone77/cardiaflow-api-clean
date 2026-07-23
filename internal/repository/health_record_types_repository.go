@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
@@ -205,6 +206,11 @@ func (r *healthRecordTypeRepository) Delete(ctx context.Context, id string) erro
 	result, err := r.db.ExecContext(ctx, query, id)
 
 	if err != nil {
+		pqErr, ok := err.(*pq.Error)
+		fmt.Printf("error: %s | constraint: %s", pqErr.Code, pqErr.Constraint)
+		if ok && pqErr.Code == "23503" && pqErr.Constraint == "fk_health_records_type" {
+			return domain.ErrorHealthRecordTypeInUse
+		}
 		return err
 	}
 

@@ -55,12 +55,6 @@ func (s *Server) Run() {
 	api.Use(auth.AuthMiddleware())
 	{
 
-		api.GET("/healthrecordtypes", healthRecordTypeHandler.GetAll)
-		api.GET("/healthrecordtypes/:id", healthRecordTypeHandler.GetByID)
-		api.GET("/healthrecordtypes/code/:code", healthRecordTypeHandler.GetByCode)
-		api.DELETE("/healthrecordtypes", healthRecordTypeHandler.Delete)
-		api.PATCH("/healthrecordtypes/:id", healthRecordTypeHandler.Update)
-
 		api.GET("/healthrecord/:id", healthRecordHandler.GetByID)
 		api.GET("/healthrecord/list", healthRecordHandler.ListByUserID)
 		api.DELETE("/healthrecord", healthRecordHandler.Delete)
@@ -68,19 +62,28 @@ func (s *Server) Run() {
 
 	}
 
-	users := r.Group("/api")
+	healtRecordTypesHND := r.Group("/api")
 	{
-		users.GET("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.Get)
-		users.GET("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.GetById)
-		users.DELETE("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Delete)
-		users.PATCH("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Update)
-		users.POST("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Create)
+		healtRecordTypesHND.POST("/healthrecordtypes", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), healthRecordTypeHandler.Create)
+		healtRecordTypesHND.GET("/healthrecordtypes", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordTypeHandler.GetAll)
+		healtRecordTypesHND.GET("/healthrecordtypes/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordTypeHandler.GetByID)
+		healtRecordTypesHND.GET("/healthrecordtypes/code/:code", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordTypeHandler.GetByCode)
+		healtRecordTypesHND.DELETE("/healthrecordtypes", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), healthRecordTypeHandler.Delete)
+		healtRecordTypesHND.PATCH("/healthrecordtypes/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), healthRecordTypeHandler.Update)
+	}
+
+	usersHND := r.Group("/api")
+	{
+		usersHND.GET("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.Get)
+		usersHND.GET("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), userHandler.GetById)
+		usersHND.DELETE("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Delete)
+		usersHND.PATCH("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Update)
+		usersHND.POST("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Create)
 	}
 
 	create := r.Group("/api")
 	{
 
-		create.POST("/healthrecordtypes", healthRecordTypeHandler.Create)
 		create.POST("/healthrecord", healthRecordHandler.Create)
 	}
 
