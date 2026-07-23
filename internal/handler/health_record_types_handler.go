@@ -177,11 +177,11 @@ func (h *HealthRecordTypeHandler) GetAll(c *gin.Context) {
 // @Tags         Health Record Type
 // @Security     BearerAuth
 // @Produce      json
-// @Param        code query string true "Health Record Type UUID"
+// @Param        id query string true "Health Record Type UUID"
 // @Success      209
 // @Failure      404 {object} dto.ErrorResponse
 // @Failure      403 {object} dto.ErrorResponse
-// @Router       /api/healthrecordtypes{id} [delete]
+// @Router       /api/healthrecordtypes [delete]
 func (h *HealthRecordTypeHandler) Delete(c *gin.Context) {
 	id := c.Query("id")
 
@@ -190,6 +190,11 @@ func (h *HealthRecordTypeHandler) Delete(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, domain.ErrHealthRecordTypeNotFound) {
 			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{Error: domain.ErrHealthRecordTypeNotFound.Error()})
+			return
+		}
+
+		if errors.Is(err, domain.ErrorHealthRecordTypeInUse) {
+			c.JSON(http.StatusBadRequest, handlerdto.ErrorResponse{Error: domain.ErrorHealthRecordTypeInUse.Error()})
 			return
 		}
 

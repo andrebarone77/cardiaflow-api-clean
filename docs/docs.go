@@ -433,6 +433,47 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a Health Record Type by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health Record Type"
+                ],
+                "summary": "Delete a Health Record Type by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Health Record Type UUID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "209": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/healthrecordtypes/code/{code}": {
@@ -588,49 +629,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/healthrecordtypes{id}": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Delete a Health Record Type by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Health Record Type"
-                ],
-                "summary": "Delete a Health Record Type by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Health Record Type UUID",
-                        "name": "code",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "209": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }

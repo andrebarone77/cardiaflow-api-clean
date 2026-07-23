@@ -361,6 +361,32 @@ paths:
       tags:
       - Health Record
   /api/healthrecordtypes:
+    delete:
+      description: Delete a Health Record Type by ID
+      parameters:
+      - description: Health Record Type UUID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "209":
+          description: ""
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a Health Record Type by ID
+      tags:
+      - Health Record Type
     get:
       description: Returns a health record type from its code
       produces:
@@ -520,33 +546,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Get health record type by Code
-      tags:
-      - Health Record Type
-  /api/healthrecordtypes{id}:
-    delete:
-      description: Delete a Health Record Type by ID
-      parameters:
-      - description: Health Record Type UUID
-        in: query
-        name: code
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "209":
-          description: ""
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Delete a Health Record Type by ID
       tags:
       - Health Record Type
   /api/users:

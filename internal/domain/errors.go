@@ -28,3 +28,4 @@ var ErrInvalidUserOrHealthRecordType = errors.New("invalid UserID or HealthRecor
 var ErrHealthRecordAlreadyExists = errors.New("health record already exists")
 var ErrHealthRecordNotFound = errors.New("no health record found")
 var ErrorUserIDNotProvided = errors.New("userid not provided")
+var ErrorHealthRecordTypeInUse = errors.New("health record type in use")
