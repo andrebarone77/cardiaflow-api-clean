@@ -48,9 +48,9 @@ func (s *HealthRecordService) Create(ctx context.Context, healthRecordInput serv
 	return id, nil
 }
 
-func (s *HealthRecordService) GetByID(ctx context.Context, id string) (*domain.HealthRecord, error) {
+func (s *HealthRecordService) GetByID(ctx context.Context, id string, userID string) (*domain.HealthRecord, error) {
 
-	healthRecord, err := s.repo.GetByID(ctx, id)
+	healthRecord, err := s.getAuthorizedRecord(ctx, id, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -59,9 +59,9 @@ func (s *HealthRecordService) GetByID(ctx context.Context, id string) (*domain.H
 
 }
 
-func (s *HealthRecordService) Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error {
+func (s *HealthRecordService) Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput, requesterID string) error {
 
-	healthRecord, err := s.repo.GetByID(ctx, id)
+	healthRecord, err := s.getAuthorizedRecord(ctx, id, requesterID)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,13 @@ func (s *HealthRecordService) Update(ctx context.Context, id string, update_inpu
 	return err
 }
 
-func (s *HealthRecordService) ListByUserID(ctx context.Context, userId string) ([]*domain.HealthRecord, error) {
+func (s *HealthRecordService) ListByUserID(ctx context.Context, userId string, requesterID string) ([]*domain.HealthRecord, error) {
+
+	err := s.authorizedUserAccess(userId, requesterID)
+	if err != nil {
+		return nil, err
+	}
+
 	healthRecords, err := s.repo.ListByUserID(ctx, userId)
 
 	if err != nil {
@@ -91,7 +97,12 @@ func (s *HealthRecordService) ListByUserID(ctx context.Context, userId string) (
 	return healthRecords, nil
 }
 
-func (s *HealthRecordService) Delete(ctx context.Context, id string) error {
+func (s *HealthRecordService) Delete(ctx context.Context, id string, requesterID string) error {
+	_, err := s.getAuthorizedRecord(ctx, id, requesterID)
+
+	if err != nil {
+		return err
+	}
 	return s.repo.Delete(ctx, id)
 }
 
@@ -104,4 +115,25 @@ func isMissingAttribute(healthRecordInput servicedto.HealthRecordCreateInput) bo
 	}
 
 	return false
+}
+
+func (s *HealthRecordService) getAuthorizedRecord(ctx context.Context, id string, requesterID string) (*domain.HealthRecord, error) {
+
+	healthRecord, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if healthRecord.UserID != requesterID {
+		return nil, domain.ErrForbidden
+	}
+
+	return healthRecord, nil
+}
+
+func (s *HealthRecordService) authorizedUserAccess(userID string, requesterID string) error {
+	if requesterID != userID {
+		return domain.ErrForbidden
+	}
+	return nil
 }

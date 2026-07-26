@@ -51,15 +51,13 @@ func (s *Server) Run() {
 	login := r.Group("/api/auth")
 	login.POST("/login", authHandler.Login)
 
-	api := r.Group("/api")
-	api.Use(auth.AuthMiddleware())
+	healtRecordHND := r.Group("/api")
 	{
-
-		api.GET("/healthrecord/:id", healthRecordHandler.GetByID)
-		api.GET("/healthrecord/list", healthRecordHandler.ListByUserID)
-		api.DELETE("/healthrecord", healthRecordHandler.Delete)
-		api.PATCH("/healthrecord/:id", healthRecordHandler.Update)
-
+		healtRecordHND.POST("/healthrecord", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordHandler.Create)
+		healtRecordHND.GET("/healthrecord/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordHandler.GetByID)
+		healtRecordHND.GET("/healthrecord/list", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordHandler.ListByUserID)
+		healtRecordHND.DELETE("/healthrecord", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordHandler.Delete)
+		healtRecordHND.PATCH("/healthrecord/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager, domain.RoleUser), healthRecordHandler.Update)
 	}
 
 	healtRecordTypesHND := r.Group("/api")
@@ -79,12 +77,6 @@ func (s *Server) Run() {
 		usersHND.DELETE("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Delete)
 		usersHND.PATCH("/users/:id", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Update)
 		usersHND.POST("/users", auth.AuthMiddleware(), auth.RequireRoles(domain.RoleAdmin, domain.RoleManager), userHandler.Create)
-	}
-
-	create := r.Group("/api")
-	{
-
-		create.POST("/healthrecord", healthRecordHandler.Create)
 	}
 
 	r.GET("/ping", func(ctx *gin.Context) {

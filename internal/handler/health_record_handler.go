@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/andrebarone77/cardiaflow-api/internal/domain"
@@ -13,10 +14,10 @@ import (
 
 type HealthRecordService interface {
 	Create(ctx context.Context, healthRecordInput servicedto.HealthRecordCreateInput) (string, error)
-	GetByID(ctx context.Context, id string) (*domain.HealthRecord, error)
-	Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error
-	ListByUserID(ctx context.Context, userId string) ([]*domain.HealthRecord, error)
-	Delete(ctx context.Context, id string) error
+	GetByID(ctx context.Context, id string, userID string) (*domain.HealthRecord, error)
+	Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput, userID string) error
+	ListByUserID(ctx context.Context, userId string, requesterID string) ([]*domain.HealthRecord, error)
+	Delete(ctx context.Context, id string, requesterID string) error
 }
 
 type HealthRecordHandler struct {
@@ -41,9 +42,32 @@ func NewHealthRecordHandler(service HealthRecordService) *HealthRecordHandler {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/healthrecord [post]
 func (h *HealthRecordHandler) Create(c *gin.Context) {
+	reqID, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterID, ok := reqID.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
 	var req handlerdto.CreateHealthRecordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, handlerdto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	if requesterID != *req.UserID {
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
 		return
 	}
 
@@ -77,6 +101,22 @@ func (h *HealthRecordHandler) Create(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/healthrecord/{id} [patch]
 func (h *HealthRecordHandler) Update(c *gin.Context) {
+	reqID, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterID, ok := reqID.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
 	var req handlerdto.UpdateHealthRecordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, handlerdto.ErrorResponse{Error: err.Error()})
@@ -89,12 +129,18 @@ func (h *HealthRecordHandler) Update(c *gin.Context) {
 		return
 	}
 
-	err := h.healthRecordService.Update(c.Request.Context(), id, toHealthRecordServiceUpdateInput(req))
+	err := h.healthRecordService.Update(c.Request.Context(), id, toHealthRecordServiceUpdateInput(req), requesterID)
 	if err != nil {
 		if errors.Is(err, domain.ErrHealthRecordNotFound) {
 			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{Error: err.Error()})
 			return
 		}
+
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, handlerdto.ErrorResponse{Error: "Forbidden"})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, handlerdto.ErrorResponse{Error: err.Error()})
 		return
 	}
@@ -118,13 +164,31 @@ func (h *HealthRecordHandler) Update(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/healthrecord/{id} [get]
 func (h *HealthRecordHandler) GetByID(c *gin.Context) {
+
+	reqID, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterID, ok := reqID.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, handlerdto.ErrorResponse{Error: "missing record id"})
 		return
 	}
 
-	healthRecord, err := h.healthRecordService.GetByID(c.Request.Context(), id)
+	healthRecord, err := h.healthRecordService.GetByID(c.Request.Context(), id, requesterID)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrHealthRecordNotFound) {
@@ -159,6 +223,24 @@ func (h *HealthRecordHandler) GetByID(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/healthrecord/list [get]
 func (h *HealthRecordHandler) ListByUserID(c *gin.Context) {
+
+	reqID, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterID, ok := reqID.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
 	userID := c.Query("user_id")
 
 	if userID == "" {
@@ -166,11 +248,17 @@ func (h *HealthRecordHandler) ListByUserID(c *gin.Context) {
 		return
 	}
 
-	healthRecords, err := h.healthRecordService.ListByUserID(c.Request.Context(), userID)
+	healthRecords, err := h.healthRecordService.ListByUserID(c.Request.Context(), userID, requesterID)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrHealthRecordNotFound) {
 			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{Error: err.Error()})
+			return
+		}
+
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden,
+				handlerdto.ErrorResponse{Error: "Forbidden"})
 			return
 		}
 
@@ -205,6 +293,24 @@ func (h *HealthRecordHandler) ListByUserID(c *gin.Context) {
 // @Failure      500 {object} dto.ErrorResponse
 // @Router       /api/healthrecord [delete]
 func (h *HealthRecordHandler) Delete(c *gin.Context) {
+
+	reqID, ok := c.Get("userID")
+
+	if !ok {
+		log.Printf("Failed to get userID from Gin.context")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
+	requesterID, ok := reqID.(string)
+	if !ok {
+		log.Printf("Failed to convert userID to string")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
+
 	id := c.Query("id")
 
 	if id == "" {
@@ -212,11 +318,17 @@ func (h *HealthRecordHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := h.healthRecordService.Delete(c.Request.Context(), id)
+	err := h.healthRecordService.Delete(c.Request.Context(), id, requesterID)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrHealthRecordNotFound) {
 			c.JSON(http.StatusNotFound, handlerdto.ErrorResponse{Error: err.Error()})
+			return
+		}
+
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden,
+				handlerdto.ErrorResponse{Error: "Forbidden"})
 			return
 		}
 
