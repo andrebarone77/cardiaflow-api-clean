@@ -22,7 +22,7 @@ func (hr *healthRecordRepository) Create(ctx context.Context, healthRecord *doma
 	var id string
 	query := `
 		INSERT INTO health_records 
-			(user_id , health_record_type_id, value , notes ,   updated_at, created_at ,recorded_at)
+			(user_id , health_record_type_id, value , notes ,  updated_at, created_at ,recorded_at)
 		VALUES 
 			($1,
 			$2,
