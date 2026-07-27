@@ -17,30 +17,30 @@ import (
 
 type MockHealthRecordService struct {
 	CreateFn       func(ctx context.Context, healthRecordInput servicedto.HealthRecordCreateInput) (string, error)
-	GetByIDFn      func(ctx context.Context, id string) (*domain.HealthRecord, error)
-	UpdateFn       func(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error
-	ListByUserIDFn func(ctx context.Context, userId string) ([]*domain.HealthRecord, error)
-	DeleteFn       func(ctx context.Context, id string) error
+	GetByIDFn      func(ctx context.Context, id string, userID string) (*domain.HealthRecord, error)
+	UpdateFn       func(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput, userID string) error
+	ListByUserIDFn func(ctx context.Context, userId string, requesterID string) ([]*domain.HealthRecord, error)
+	DeleteFn       func(ctx context.Context, id string, requesterID string) error
 }
 
 func (m *MockHealthRecordService) Create(ctx context.Context, healthRecordInput servicedto.HealthRecordCreateInput) (string, error) {
 	return m.CreateFn(ctx, healthRecordInput)
 }
 
-func (m *MockHealthRecordService) GetByID(ctx context.Context, id string) (*domain.HealthRecord, error) {
-	return m.GetByIDFn(ctx, id)
+func (m *MockHealthRecordService) GetByID(ctx context.Context, id string, userID string) (*domain.HealthRecord, error) {
+	return m.GetByIDFn(ctx, id, userID)
 }
 
-func (m *MockHealthRecordService) Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error {
-	return m.UpdateFn(ctx, id, update_input)
+func (m *MockHealthRecordService) Update(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput, userID string) error {
+	return m.UpdateFn(ctx, id, update_input, userID)
 }
 
-func (m *MockHealthRecordService) ListByUserID(ctx context.Context, userId string) ([]*domain.HealthRecord, error) {
-	return m.ListByUserIDFn(ctx, userId)
+func (m *MockHealthRecordService) ListByUserID(ctx context.Context, userId string, requesterID string) ([]*domain.HealthRecord, error) {
+	return m.ListByUserIDFn(ctx, userId, requesterID)
 }
 
-func (m *MockHealthRecordService) Delete(ctx context.Context, id string) error {
-	return m.DeleteFn(ctx, id)
+func (m *MockHealthRecordService) Delete(ctx context.Context, id string, requesterID string) error {
+	return m.DeleteFn(ctx, id, requesterID)
 }
 
 func TestHealthRecord_Create(t *testing.T) {
@@ -54,6 +54,9 @@ func TestHealthRecord_Create(t *testing.T) {
 			case 2:
 				errNum = 0
 				return "", errors.New("Generic Errro")
+			case 3:
+				errNum = 0
+				return "", domain.ErrForbidden
 			}
 			return ID_OK, nil
 		},
@@ -65,48 +68,48 @@ func TestHealthRecord_Create(t *testing.T) {
 		body            string
 		expected_status int
 		err_num         int
+		requester_id    string
+		requester_num   int8
 	}{
 		{
-			test_name: "Test OK",
-			body: `
-			{
-				"user_id": "userID",
-				"health_record_type_id": "type",
-				"value": 3.0,
-				"notes": "Notes Ok",
-				"recorded_at": "2026-06-25T19:30:00Z"
-			}
-			`,
+			test_name:       "Test OK",
+			body:            make_body(USER_ID_REGULAR),
 			expected_status: http.StatusCreated,
 			err_num:         0,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
-			test_name: "Test Invalid ID",
-			body: `
-			{
-				"user_id": "userID",
-				"health_record_type_id": "invalid_type",
-				"value": 3.0,
-				"notes": "Notes Ok",
-				"recorded_at": "2026-06-25T19:30:00Z"
-			}
-			`,
+			test_name:       "Test Invalid ID",
+			body:            make_body(USER_ID_REGULAR),
 			expected_status: http.StatusBadRequest,
 			err_num:         1,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
-			test_name: "Test Generic Error",
-			body: `
-			{
-				"user_id": "userID",
-				"health_record_type_id": "invalid_type",
-				"value": 3.0,
-				"notes": "Notes Ok",
-				"recorded_at": "2026-06-25T19:30:00Z"
-			}
-			`,
+			test_name:       "Test Generic Error",
+			body:            make_body(USER_ID_REGULAR),
 			expected_status: http.StatusInternalServerError,
 			err_num:         2,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Forbidden Error",
+			body:            make_body(USER_ID_REGULAR),
+			expected_status: http.StatusInternalServerError,
+			err_num:         2,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Forbidden User ID",
+			body:            make_body(USER_ID_MANAGER),
+			expected_status: http.StatusForbidden,
+			err_num:         0,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name: "Test Invalid Body",
@@ -120,6 +123,23 @@ func TestHealthRecord_Create(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Missing Requester ID",
+			body:            make_body(USER_ID_REGULAR),
+			expected_status: http.StatusForbidden,
+			err_num:         2,
+			requester_num:   0,
+		},
+
+		{
+			test_name:       "Test Conversion Fail",
+			body:            make_body(USER_ID_MANAGER),
+			expected_status: http.StatusForbidden,
+			err_num:         0,
+			requester_num:   123,
 		},
 	}
 
@@ -132,6 +152,15 @@ func TestHealthRecord_Create(t *testing.T) {
 				"/api/healthrecord",
 				strings.NewReader(tt.body),
 			)
+
+			if tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
 			errNum = tt.err_num
 			handler.Create(c)
 			status := c.Writer.Status()
@@ -145,9 +174,21 @@ func TestHealthRecord_Create(t *testing.T) {
 
 }
 
+func make_body(requesterID string) string {
+	return fmt.Sprintf(`
+			{
+				"user_id": "%s",
+				"health_record_type_id": "type",
+				"value": 3.0,
+				"notes": "Notes Ok",
+				"recorded_at": "2026-06-25T19:30:00Z"
+			}
+			`, requesterID)
+}
+
 func TestHealthRecord_Update(t *testing.T) {
 	mockHealthRecordService := &MockHealthRecordService{
-		UpdateFn: func(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput) error {
+		UpdateFn: func(ctx context.Context, id string, update_input servicedto.HealthRecordUpdateInput, userID string) error {
 			if id == ID_NOT_FOUND {
 				return domain.ErrHealthRecordNotFound
 			}
@@ -155,6 +196,11 @@ func TestHealthRecord_Update(t *testing.T) {
 			if id == ID_GENERIC_ERROR {
 				return errors.New("Generic Error")
 			}
+
+			if id == ID_FORBIDDEN {
+				return domain.ErrForbidden
+			}
+
 			return nil
 		},
 	}
@@ -166,6 +212,8 @@ func TestHealthRecord_Update(t *testing.T) {
 		id              string
 		body            string
 		expected_status int
+		requester_id    string
+		requester_num   int8
 	}{
 		{
 			test_name: "Test Ok",
@@ -178,6 +226,8 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusOK,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name: "Test Missing ID",
@@ -189,6 +239,8 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name: "Test Malformed Body",
@@ -201,6 +253,8 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name: "Test Not Found",
@@ -213,6 +267,8 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusNotFound,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name: "Test Generic Error",
@@ -225,6 +281,48 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			`,
 			expected_status: http.StatusInternalServerError,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name: "Test Generic Error",
+			id:        ID_FORBIDDEN,
+			body: `
+			{
+				"value": 3.0,
+				"notes": "Notes Ok",
+				"recorded_at": "2026-06-25T19:30:00Z"
+			}
+			`,
+			expected_status: http.StatusForbidden,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name: "Missing Requester ID",
+			id:        ID_GENERIC_ERROR,
+			body: `
+			{
+				"value": 3.0,
+				"notes": "Notes Ok",
+				"recorded_at": "2026-06-25T19:30:00Z"
+			}
+			`,
+			expected_status: http.StatusForbidden,
+			requester_num:   0,
+		},
+		{
+			test_name: "Conversion Fail",
+			id:        ID_GENERIC_ERROR,
+			body: `
+			{
+				"value": 3.0,
+				"notes": "Notes Ok",
+				"recorded_at": "2026-06-25T19:30:00Z"
+			}
+			`,
+			expected_status: http.StatusForbidden,
+			requester_num:   123,
 		},
 	}
 
@@ -238,6 +336,15 @@ func TestHealthRecord_Update(t *testing.T) {
 				"/api/healthrecord",
 				strings.NewReader(tt.body),
 			)
+
+			if tt.requester_id != "" {
+				c.Set("userID", USER_ID_REGULAR)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
 			if tt.id != "" {
 				c.Params = gin.Params{
 					{
@@ -257,7 +364,7 @@ func TestHealthRecord_Update(t *testing.T) {
 }
 func TestHealhRecordType_GetById(t *testing.T) {
 	mockHealthRecordService := &MockHealthRecordService{
-		GetByIDFn: func(ctx context.Context, id string) (*domain.HealthRecord, error) {
+		GetByIDFn: func(ctx context.Context, id string, userID string) (*domain.HealthRecord, error) {
 			if id == ID_NOT_FOUND {
 				return nil, domain.ErrHealthRecordNotFound
 			}
@@ -267,7 +374,9 @@ func TestHealhRecordType_GetById(t *testing.T) {
 			if id == ID_NIL_RECORD {
 				return nil, nil
 			}
-			return &domain.HealthRecord{}, nil
+			return &domain.HealthRecord{
+				UserID: USER_ID_REGULAR,
+			}, nil
 		},
 	}
 
@@ -277,30 +386,54 @@ func TestHealhRecordType_GetById(t *testing.T) {
 		test_name       string
 		id              string
 		expected_status int
+		requester_id    string
+		requester_num   int8
 	}{
 		{
 			test_name:       "Test OK",
 			id:              ID_OK,
 			expected_status: http.StatusOK,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Not Found",
 			id:              ID_NOT_FOUND,
 			expected_status: http.StatusNotFound,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Generic Error",
 			id:              ID_GENERIC_ERROR,
 			expected_status: http.StatusInternalServerError,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Generic Error",
 			id:              ID_NIL_RECORD,
 			expected_status: http.StatusInternalServerError,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test missing Id",
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Missing Requester ID",
+			id:              ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Conversion Fail",
+			id:              ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   123,
 		},
 	}
 	for _, tt := range tests {
@@ -314,6 +447,13 @@ func TestHealhRecordType_GetById(t *testing.T) {
 				nil,
 			)
 
+			if tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
 			if tt.id != "" {
 				c.Params = gin.Params{
 					{
@@ -336,7 +476,7 @@ func TestHealhRecordType_GetById(t *testing.T) {
 func TestHealthRecord_ListByUserID(t *testing.T) {
 
 	mockHealthRecord := &MockHealthRecordService{
-		ListByUserIDFn: func(ctx context.Context, userId string) ([]*domain.HealthRecord, error) {
+		ListByUserIDFn: func(ctx context.Context, userId string, requesterID string) ([]*domain.HealthRecord, error) {
 			notes := "Notes Ok"
 
 			if userId == ID_NOT_FOUND {
@@ -351,10 +491,18 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 				return nil, errors.New("Generic Error")
 			}
 
+			if userId == ID_FORBIDDEN {
+				return nil, domain.ErrForbidden
+			}
+			if userId == ID_NIL_RECORD {
+				var listRecord []*domain.HealthRecord
+				listRecord = append(listRecord, nil)
+				return listRecord, nil
+			}
 			return []*domain.HealthRecord{
 				{
 					ID:                 ID_OK,
-					UserID:             ID_OK,
+					UserID:             USER_ID_REGULAR,
 					HealthRecordTypeID: ID_OK,
 					Value:              3.0,
 					Notes:              &notes,
@@ -364,7 +512,7 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 				},
 				{
 					ID:                 ID_OK,
-					UserID:             ID_OK,
+					UserID:             USER_ID_REGULAR,
 					HealthRecordTypeID: ID_OK,
 					Value:              3.0,
 					Notes:              &notes,
@@ -382,32 +530,69 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 		test_name       string
 		user_id         string
 		expected_status int
+		requester_id    string
+		requester_num   int8
 	}{
 		{
 			test_name:       "Test Ok",
 			user_id:         ID_OK,
 			expected_status: http.StatusOK,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Nil Record",
+			user_id:         ID_NIL_RECORD,
+			expected_status: http.StatusOK,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Not Found",
 			user_id:         ID_NOT_FOUND,
 			expected_status: http.StatusNotFound,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Generic Error",
 			user_id:         ID_GENERIC_ERROR,
 			expected_status: http.StatusInternalServerError,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Generic Error",
 			user_id:         ID_EMPTY_RETURN,
 			expected_status: http.StatusNotFound,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
-
+		{
+			test_name:       "Test Forbidden",
+			user_id:         ID_FORBIDDEN,
+			expected_status: http.StatusForbidden,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
 		{
 			test_name:       "Test Empty UserID",
 			user_id:         "",
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Missing Requester ID",
+			user_id:         ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Missing Requester ID",
+			user_id:         ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   123,
 		},
 	}
 
@@ -415,6 +600,15 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 		t.Run(tt.test_name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
+
+			if tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
 			c.Request = httptest.NewRequest(
 				http.MethodGet,
 				fmt.Sprintf("/api/healthrecord?user_id=%v", tt.user_id),
@@ -434,11 +628,13 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 
 func TestHandlerRecord_Delete(t *testing.T) {
 	mockHealthRecordService := &MockHealthRecordService{
-		DeleteFn: func(ctx context.Context, id string) error {
+		DeleteFn: func(ctx context.Context, id string, requesterID string) error {
 			if id == ID_NOT_FOUND {
 				return domain.ErrHealthRecordNotFound
 			}
-
+			if id == ID_FORBIDDEN {
+				return domain.ErrForbidden
+			}
 			if id == ID_GENERIC_ERROR {
 				return errors.New("Generic Error")
 			}
@@ -452,33 +648,70 @@ func TestHandlerRecord_Delete(t *testing.T) {
 		test_name       string
 		id              string
 		expected_status int
+		requester_id    string
+		requester_num   int8
 	}{
 		{
 			test_name:       "Test Ok",
 			id:              ID_OK,
 			expected_status: http.StatusNoContent,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Not Found",
 			id:              ID_NOT_FOUND,
 			expected_status: http.StatusNotFound,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
 		{
 			test_name:       "Test Generic Error",
 			id:              ID_GENERIC_ERROR,
 			expected_status: http.StatusInternalServerError,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
 		},
-
+		{
+			test_name:       "Test Forbidden",
+			id:              ID_FORBIDDEN,
+			expected_status: http.StatusForbidden,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
 		{
 			test_name:       "Test No ID",
 			id:              "",
 			expected_status: http.StatusBadRequest,
+			requester_id:    USER_ID_REGULAR,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test Missing Requester ID",
+			id:              ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   0,
+		},
+		{
+			test_name:       "Test conversion failed",
+			id:              ID_OK,
+			expected_status: http.StatusForbidden,
+			requester_num:   123,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.test_name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
+
+			if tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
 			c.Request = httptest.NewRequest(
 				http.MethodDelete,
 				fmt.Sprintf("/api/healthrecord?id=%v", tt.id),

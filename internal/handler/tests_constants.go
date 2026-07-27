@@ -7,6 +7,7 @@ const PASSORD_OK = "Pa55w0rd"
 
 const ID_GENERIC_ERROR = "e238e28a-c655-4c6f-a47a-2057004bac84"
 const ID_NIL_RECORD = "27228236-9c5e-401f-9a23-209ccf886ad6"
+const ID_FORBIDDEN = "b6b4eb15-fc87-4807-b190-c55e6e03ae19"
 
 const EMAIL_EXISTS = "email@exists.com"
 const ID_EMAIL_EXISTS = "964951c7-93a9-4e34-9043-2876e6f8c148"
