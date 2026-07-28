@@ -148,6 +148,10 @@ func TestUserHandler_Get(t *testing.T) {
 				return nil, domain.ErrUserNotFound
 			}
 
+			if email == EMAIL_NOT_AUTHORIZED && requesterRole == domain.RoleUser {
+				return nil, domain.ErrForbidden
+			}
+
 			if email == EMAIL_OTHER_ERROR {
 				return nil, errors.New("Generic Error")
 			}
@@ -163,28 +167,99 @@ func TestUserHandler_Get(t *testing.T) {
 	handler := NewUserHandler(userMock)
 
 	tests := []struct {
-		test_name    string
-		email        string
-		expect_error bool
+		test_name          string
+		email              string
+		expect_error       bool
+		requester_id       string
+		requester_num      int8
+		requester_role     domain.Role
+		requester_role_num int8
 	}{
 		{
-			test_name:    "Test OK",
-			email:        EMAIL_OK,
-			expect_error: false,
+			test_name:          "Test OK",
+			email:              EMAIL_OK,
+			expect_error:       false,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Missing Email",
-			expect_error: true,
+			test_name:          "Test Missing Email",
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Email Not Found",
-			email:        EMAIL_NOT_FOUND,
-			expect_error: false,
+			test_name:          "Test Email Not Found",
+			email:              EMAIL_NOT_FOUND,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Generic Error",
-			email:        EMAIL_OTHER_ERROR,
-			expect_error: false,
+			test_name:          "Test Email Forbidden",
+			email:              EMAIL_NOT_AUTHORIZED,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test Generic Error",
+			email:              EMAIL_OTHER_ERROR,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test RequesterID Conversion Error",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      123,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "User Forbidden",
+			email:              EMAIL_NOT_AUTHORIZED,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      123,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Missing Requester ID",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Missing Requester Role",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test Role Conversion Error",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role_num: 123,
 		},
 	}
 
@@ -197,11 +272,30 @@ func TestUserHandler_Get(t *testing.T) {
 				fmt.Sprintf("/users?email=%s", tt.email),
 				nil,
 			)
+			if tt.requester_num == 0 && tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
+			if tt.requester_role != "" && tt.requester_role_num != 123 {
+				c.Set("role", tt.requester_role)
+			}
+
+			if tt.requester_role_num == 123 {
+				c.Set("role", tt.requester_role_num)
+			}
+
 			handler.Get(c)
 
 			status := c.Writer.Status()
 			if tt.expect_error && status == http.StatusOK {
 				t.Errorf("Expecting error")
+			}
+
+			if !tt.expect_error && status != http.StatusOK {
+				t.Errorf(("Unexptected Error"))
 			}
 
 		})
