@@ -21,6 +21,8 @@ const ID_EMPTY_RETURN = "bf0816e9-28d7-41c4-a2f9-f9e0a7160a73"
 
 const ID_IMMUTABLE = "dc8424bb-84d4-4660-bcb5-95ae5f91074b"
 
+const ID_IN_USE = "62e079f6-58a5-406d-aac5-248a70b7a417"
+
 const EMAIL_NOT_AUTHORIZED = "email@notauthorized.com"
 
 const USER_ID_REGULAR = "71408d3a-208e-4886-ac0d-6963771a0f32"

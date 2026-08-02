@@ -609,6 +609,9 @@ func TestHealhRecordTypeHandler_Delete(t *testing.T) {
 			if id == ID_IMMUTABLE {
 				return domain.ErrHealthRecordTypeImmutable
 			}
+			if id == ID_IN_USE {
+				return domain.ErrorHealthRecordTypeInUse
+			}
 			return nil
 		},
 	}
@@ -634,6 +637,11 @@ func TestHealhRecordTypeHandler_Delete(t *testing.T) {
 			test_name:       "Test Immutable",
 			id:              ID_IMMUTABLE,
 			expected_status: http.StatusForbidden,
+		},
+		{
+			test_name:       "Test Record in Use",
+			id:              ID_IN_USE,
+			expected_status: http.StatusBadRequest,
 		},
 	}
 
