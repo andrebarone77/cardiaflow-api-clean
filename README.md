@@ -149,7 +149,7 @@ All authenticated users, regardless of role, may access only their own Health Re
 - Minor mapping fixes in Health Record responses
 
 ## Roadmap
-    - [ ] User Role and permissions
+    - [X] User Role and permissions
     - [X] Unit Tests
     - [X] Swagger documentation
     - [ ] Frontend application
