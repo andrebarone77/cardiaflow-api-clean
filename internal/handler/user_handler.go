@@ -284,6 +284,17 @@ func (h *UserHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// Update godoc
+//
+// @Summary      Update User by ID
+// @Description  Update a User by its UUID
+// @Tags         Users
+// @Security     BearerAuth
+// @Param        id path string true "User UUID"
+// @Success      200 {object} dto.UserResponse
+// @Failure      404 {object} dto.ErrorResponse
+// @Failure      500 {object} dto.ErrorResponse
+// @Router       /api/users/{id} [patch]
 func (h *UserHandler) Update(c *gin.Context) {
 	var req handlerdto.UpdateUserRequest
 	id, ok := c.Get("userID")
@@ -351,9 +362,12 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id": user.ID,
-		"name":  user.Name,
-		"email": user.Email})
+	response := handlerdto.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+	c.JSON(http.StatusOK, response)
 
 }
 

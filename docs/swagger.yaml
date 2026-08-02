@@ -144,7 +144,6 @@ definitions:
         example: Andre Barone
         type: string
     type: object
-host: localhost:8080
 info:
   contact:
     email: andrebarone77@gmail.com
@@ -657,6 +656,32 @@ paths:
       security:
       - BearerAuth: []
       summary: Get user by ID
+      tags:
+      - Users
+    patch:
+      description: Update a User by its UUID
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User by ID
       tags:
       - Users
 securityDefinitions:
