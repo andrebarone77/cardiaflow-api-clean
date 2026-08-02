@@ -1,5 +1,5 @@
 // @title           Cardiaflow API
-// @version         1.2.1
+// @version         1.2.2
 // @description     REST API for managing users and health records.
 // @termsOfService  https://github.com/andrebarone77/cardiaflow-api
 
