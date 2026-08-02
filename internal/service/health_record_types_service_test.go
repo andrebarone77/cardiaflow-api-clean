@@ -110,6 +110,16 @@ func TestHealthRecordType_Create(t *testing.T) {
 			expect_error:          true,
 			expcted_create_called: false,
 		},
+		{
+			test_name: "Invalid Code",
+			health_record: dto.HealthRecordTypeInput{
+				Name: HEALTH_RECORD_NAME_OK,
+				Code: INVALID_CODE,
+				Unit: &unit_ok,
+			},
+			expect_error:          true,
+			expcted_create_called: false,
+		},
 	}
 
 	for _, tt := range tests {
