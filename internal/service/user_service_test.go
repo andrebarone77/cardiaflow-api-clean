@@ -105,32 +105,52 @@ func TestUserService_GetByEmail(t *testing.T) {
 				return nil, domain.ErrUserNotFound
 			}
 
-			return nil, nil
+			if email == "different@email.com" {
+				return &domain.User{
+					ID: REQUESTER_DIFFERENT_ID,
+				}, nil
+			}
+			return &domain.User{
+				ID: REQUESTER_ID,
+			}, nil
 		},
 	}
 
 	service := NewUserService(mockRepo)
 
 	tests := []struct {
-		test_name     string
-		email         string
-		expects_error bool
+		test_name      string
+		email          string
+		requester_id   string
+		requester_role domain.Role
+		expects_error  bool
 	}{
 		{
-			test_name:     "success",
-			email:         "andre@email.com",
-			expects_error: false,
+			test_name:      "success",
+			email:          "andre@email.com",
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  false,
 		},
 		{
-			test_name:     "missing_email",
-			expects_error: true,
+			test_name:      "missing_email",
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
+		},
+		{
+			test_name:      "different userID",
+			email:          "different@email.com",
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.test_name, func(t *testing.T) {
 
-			_, err := service.GetByEmail(context.Background(), tt.email)
+			_, err := service.GetByEmail(context.Background(), tt.email, tt.requester_id, tt.requester_role)
 
 			if tt.expects_error && err == nil {
 				t.Errorf("expected error, got nil")
@@ -150,7 +170,9 @@ func TestUserService_GetUserById(t *testing.T) {
 			if id == UUID_NOT_FOUND {
 				return nil, domain.ErrUserNotFound
 			}
-			return nil, nil
+			return &domain.User{
+				ID: REQUESTER_ID,
+			}, nil
 
 		},
 	}
@@ -158,25 +180,31 @@ func TestUserService_GetUserById(t *testing.T) {
 	service := NewUserService(mockRepo)
 
 	tests := []struct {
-		test_name     string
-		id            string
-		expects_error bool
+		test_name      string
+		id             string
+		requester_id   string
+		requester_role domain.Role
+		expects_error  bool
 	}{
 		{
-			test_name:     "success",
-			id:            HEALTH_RECORD_NAME_OK,
-			expects_error: false,
+			test_name:      "success",
+			id:             REQUESTER_ID,
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  false,
 		},
 		{
-			test_name:     "not found",
-			id:            UUID_NOT_FOUND,
-			expects_error: true,
+			test_name:      "not found",
+			id:             UUID_NOT_FOUND,
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.test_name, func(t *testing.T) {
-			_, err := service.GetById(context.Background(), tt.id)
+			_, err := service.GetById(context.Background(), tt.id, tt.requester_id, tt.requester_role)
 
 			if !tt.expects_error && err != nil {
 				t.Errorf("unexpected error: %v", err)
@@ -216,45 +244,65 @@ func TestUserService_Update(t *testing.T) {
 	service := NewUserService(mockRepo)
 
 	tests := []struct {
-		test_name     string
-		id            string
-		name          string
-		email         string
-		password      string
-		saveError     error
-		expects_error bool
-		expects_save  bool
-		expects_get   bool
+		test_name      string
+		id             string
+		name           string
+		email          string
+		password       string
+		saveError      error
+		requester_id   string
+		requester_role domain.Role
+		expects_error  bool
+		expects_save   bool
+		expects_get    bool
 	}{
 		{
-			test_name:     "Sucess",
-			id:            HEALTH_RECORD_NAME_OK,
-			name:          "Andre",
-			email:         "andre@email.com",
-			password:      "password123",
-			expects_error: false,
-			expects_save:  true,
-			expects_get:   true,
+			test_name:      "Sucess",
+			id:             REQUESTER_ID,
+			name:           "Andre",
+			email:          "andre@email.com",
+			password:       "password123",
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  false,
+			expects_save:   true,
+			expects_get:    true,
 		},
 		{
-			test_name:     "Not Found",
-			id:            UUID_NOT_FOUND,
-			name:          "Andre",
-			email:         "andre@email.com",
-			password:      "password123",
-			expects_error: true,
-			expects_save:  false,
-			expects_get:   true,
+			test_name:      "Not Found",
+			id:             UUID_NOT_FOUND,
+			name:           "Andre",
+			email:          "andre@email.com",
+			password:       "password123",
+			requester_id:   UUID_NOT_FOUND,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
+			expects_save:   false,
+			expects_get:    true,
 		},
 		{
-			test_name:     "Save Error",
-			id:            UUID_SAVE_ERRROR,
-			name:          "Andre",
-			email:         "andre@email.com",
-			password:      "password123",
-			expects_error: true,
-			expects_save:  true,
-			expects_get:   true,
+			test_name:      "Save Error",
+			id:             UUID_SAVE_ERRROR,
+			name:           "Andre",
+			email:          "andre@email.com",
+			password:       "password123",
+			requester_id:   UUID_SAVE_ERRROR,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
+			expects_save:   true,
+			expects_get:    true,
+		},
+		{
+			test_name:      "Save Error",
+			id:             REQUESTER_DIFFERENT_ID,
+			name:           "Andre",
+			email:          "andre@email.com",
+			password:       "password123",
+			requester_id:   REQUESTER_ID,
+			requester_role: REQUESTER_ROLE_USER,
+			expects_error:  true,
+			expects_save:   false,
+			expects_get:    false,
 		},
 	}
 
@@ -265,7 +313,7 @@ func TestUserService_Update(t *testing.T) {
 				Email:    &tt.email,
 				Password: &tt.password,
 			}
-			_, err := service.Update(context.Background(), tt.id, input)
+			_, err := service.Update(context.Background(), tt.id, tt.requester_id, tt.requester_role, input)
 
 			if !tt.expects_error && err != nil {
 				t.Errorf("unexpected error: %v", err)
@@ -308,26 +356,48 @@ func TestUserService_Delete(t *testing.T) {
 	tests := []struct {
 		test_name             string
 		id                    string
+		requester_id          string
+		requester_role        domain.Role
 		expects_delete_called bool
 		expect_error          bool
 	}{
 		{
 			test_name:             "Sucess",
 			id:                    HEALTH_RECORD_NAME_OK,
+			requester_id:          REQUESTER_ID,
+			requester_role:        REQUESTER_ROLE_ADMIN,
 			expects_delete_called: true,
 			expect_error:          false,
 		},
 		{
 			test_name:             "Not Found",
 			id:                    UUID_NOT_FOUND,
+			requester_id:          REQUESTER_ID,
+			requester_role:        REQUESTER_ROLE_ADMIN,
 			expects_delete_called: true,
+			expect_error:          true,
+		},
+		{
+			test_name:             "Not Found",
+			id:                    UUID_NOT_FOUND,
+			requester_id:          REQUESTER_ID,
+			requester_role:        REQUESTER_ROLE_USER,
+			expects_delete_called: false,
+			expect_error:          true,
+		},
+		{
+			test_name:             "Sucess",
+			id:                    REQUESTER_ID,
+			requester_id:          REQUESTER_ID,
+			requester_role:        REQUESTER_ROLE_ADMIN,
+			expects_delete_called: false,
 			expect_error:          true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.test_name, func(t *testing.T) {
-			err := service.Delete(context.Background(), tt.id)
+			err := service.Delete(context.Background(), tt.id, tt.requester_id, tt.requester_role)
 
 			if tt.expects_delete_called && !deleteCalled {
 				t.Errorf("Delete function not called")

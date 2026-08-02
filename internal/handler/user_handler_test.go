@@ -148,6 +148,10 @@ func TestUserHandler_Get(t *testing.T) {
 				return nil, domain.ErrUserNotFound
 			}
 
+			if email == EMAIL_NOT_AUTHORIZED && requesterRole == domain.RoleUser {
+				return nil, domain.ErrForbidden
+			}
+
 			if email == EMAIL_OTHER_ERROR {
 				return nil, errors.New("Generic Error")
 			}
@@ -163,28 +167,99 @@ func TestUserHandler_Get(t *testing.T) {
 	handler := NewUserHandler(userMock)
 
 	tests := []struct {
-		test_name    string
-		email        string
-		expect_error bool
+		test_name          string
+		email              string
+		expect_error       bool
+		requester_id       string
+		requester_num      int8
+		requester_role     domain.Role
+		requester_role_num int8
 	}{
 		{
-			test_name:    "Test OK",
-			email:        EMAIL_OK,
-			expect_error: false,
+			test_name:          "Test OK",
+			email:              EMAIL_OK,
+			expect_error:       false,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Missing Email",
-			expect_error: true,
+			test_name:          "Test Missing Email",
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Email Not Found",
-			email:        EMAIL_NOT_FOUND,
-			expect_error: false,
+			test_name:          "Test Email Not Found",
+			email:              EMAIL_NOT_FOUND,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
 		},
 		{
-			test_name:    "Test Generic Error",
-			email:        EMAIL_OTHER_ERROR,
-			expect_error: false,
+			test_name:          "Test Email Forbidden",
+			email:              EMAIL_NOT_AUTHORIZED,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test Generic Error",
+			email:              EMAIL_OTHER_ERROR,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test RequesterID Conversion Error",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      123,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "User Forbidden",
+			email:              EMAIL_NOT_AUTHORIZED,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      123,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Missing Requester ID",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Missing Requester Role",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role_num: 0,
+		},
+		{
+			test_name:          "Test Role Conversion Error",
+			email:              EMAIL_OK,
+			expect_error:       true,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role_num: 123,
 		},
 	}
 
@@ -197,11 +272,30 @@ func TestUserHandler_Get(t *testing.T) {
 				fmt.Sprintf("/users?email=%s", tt.email),
 				nil,
 			)
+			if tt.requester_num == 0 && tt.requester_id != "" {
+				c.Set("userID", tt.requester_id)
+			}
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
+			if tt.requester_role != "" && tt.requester_role_num != 123 {
+				c.Set("role", tt.requester_role)
+			}
+
+			if tt.requester_role_num == 123 {
+				c.Set("role", tt.requester_role_num)
+			}
+
 			handler.Get(c)
 
 			status := c.Writer.Status()
 			if tt.expect_error && status == http.StatusOK {
 				t.Errorf("Expecting error")
+			}
+
+			if !tt.expect_error && status != http.StatusOK {
+				t.Errorf(("Unexptected Error"))
 			}
 
 		})
@@ -221,6 +315,9 @@ func TestUserHandler_GetByID(t *testing.T) {
 				return nil, domain.ErrMissingAttribute
 			}
 
+			if id == ID_GENERIC_ERROR {
+				return nil, errors.New("Generic Error")
+			}
 			return &domain.User{
 				ID:    ID_OK,
 				Name:  NAME_OK,
@@ -232,22 +329,78 @@ func TestUserHandler_GetByID(t *testing.T) {
 	handler := NewUserHandler(mockUser)
 
 	tests := []struct {
-		test_name     string
-		id            string
-		expects_error bool
+		test_name          string
+		id                 string
+		requester_id       string
+		requester_num      int8
+		requester_role     domain.Role
+		requester_role_num int8
+		expects_error      bool
 	}{
 		{
-			test_name:     "Test OK",
+			test_name:          "Test OK",
+			id:                 ID_OK,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      false,
+		},
+		{
+			test_name:          "Test missing ID",
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Test Not Found",
+			id:                 ID_NOT_FOUND,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Test Generic Error",
+			id:                 ID_GENERIC_ERROR,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Test Requester Fail",
+			id:                 ID_OK,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      123,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Test Role Fail",
+			id:                 ID_OK,
+			requester_id:       USER_ID_REGULAR,
+			requester_num:      0,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 123,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Test Requester Empty",
+			id:                 ID_OK,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:     "Test Role Fail",
 			id:            ID_OK,
-			expects_error: false,
-		},
-		{
-			test_name:     "Test missing ID",
-			expects_error: true,
-		},
-		{
-			test_name:     "Test Not Found",
-			id:            ID_NOT_FOUND,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
 			expects_error: true,
 		},
 	}
@@ -266,6 +419,22 @@ func TestUserHandler_GetByID(t *testing.T) {
 				Key:   "id",
 				Value: tt.id,
 			},
+		}
+
+		if tt.requester_id != "" && tt.requester_num == 0 {
+			c.Set("userID", tt.requester_id)
+		}
+
+		if tt.requester_num == 123 {
+			c.Set("userID", tt.requester_num)
+		}
+
+		if tt.requester_role != "" && tt.requester_role_num == 0 {
+			c.Set("role", tt.requester_role)
+		}
+
+		if tt.requester_role_num == 123 {
+			c.Set("role", tt.requester_role_num)
 		}
 
 		handler.GetById(c)
@@ -299,46 +468,124 @@ func TestUserHandler_Delete(t *testing.T) {
 	handler := NewUserHandler(mockUser)
 
 	tests := []struct {
-		test_name     string
-		id            string
-		requesterRole domain.Role
-		userID        string
-		expects_error bool
+		test_name          string
+		id                 string
+		requester_role     domain.Role
+		requester_role_num int8
+		requester_id       string
+		requester_num      int8
+		expects_error      bool
 	}{
 		{
-			test_name:     "Test ok - User Admin",
-			id:            ID_OK,
-			requesterRole: domain.RoleAdmin,
-			userID:        USER_ID_ADMIN,
-			expects_error: false,
+			test_name:          "Test ok - User Admin",
+			id:                 ID_OK,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      false,
 		},
 		{
-			test_name:     "Test ok - User Manager",
-			id:            ID_OK,
-			requesterRole: domain.RoleAdmin,
-			userID:        USER_ID_MANAGER,
-			expects_error: false,
+			test_name:          "Test ok - User Manager",
+			id:                 ID_OK,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_MANAGER,
+			requester_num:      0,
+			expects_error:      false,
 		},
 		{
-			test_name:     "ID not Found",
-			id:            ID_NOT_FOUND,
-			requesterRole: domain.RoleAdmin,
-			userID:        USER_ID_ADMIN,
-			expects_error: true,
+			test_name:          "ID not Found",
+			id:                 ID_NOT_FOUND,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
 		},
 		{
-			test_name:     "ID not Found",
-			id:            ID_NOT_FOUND,
-			requesterRole: domain.RoleUser,
-			userID:        USER_ID_ADMIN,
-			expects_error: true,
+			test_name:          "ID not Found",
+			id:                 ID_NOT_FOUND,
+			requester_role:     domain.RoleUser,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
 		},
 		{
-			test_name:     "ID not Found",
-			id:            ID_GENERIC_ERROR,
-			requesterRole: domain.RoleAdmin,
-			userID:        USER_ID_ADMIN,
-			expects_error: true,
+			test_name:          "Generic error",
+			id:                 ID_GENERIC_ERROR,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Missing UserID",
+			id:                 ID_OK,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Missing Role",
+			id:                 ID_OK,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			requester_role_num: 0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Generic error",
+			id:                 ID_OK,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Generic error",
+			id:                 ID_GENERIC_ERROR,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Requester Missing",
+			id:                 ID_GENERIC_ERROR,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Role Missing",
+			id:                 ID_GENERIC_ERROR,
+			requester_role_num: 0,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Invalid Requester",
+			id:                 ID_GENERIC_ERROR,
+			requester_role:     domain.RoleAdmin,
+			requester_role_num: 0,
+			requester_num:      123,
+			expects_error:      true,
+		},
+		{
+			test_name:          "Invalid Role",
+			id:                 ID_GENERIC_ERROR,
+			requester_role_num: 123,
+			requester_id:       USER_ID_ADMIN,
+			requester_num:      0,
+			expects_error:      true,
 		},
 	}
 
@@ -357,8 +604,21 @@ func TestUserHandler_Delete(t *testing.T) {
 				},
 			}
 
-			c.Set("userID", tt.userID)
-			c.Set("role", tt.requesterRole)
+			if tt.requester_id != "" && tt.requester_num != 123 {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
+			if tt.requester_role != "" && tt.requester_role_num != 123 {
+				c.Set("role", tt.requester_role)
+			}
+
+			if tt.requester_role_num == 123 {
+				c.Set("role", tt.requester_role_num)
+			}
 
 			handler.Delete(c)
 			status := c.Writer.Status()
@@ -372,12 +632,11 @@ func TestUserHandler_Delete(t *testing.T) {
 
 }
 
-/*
 func TestUserHandler_Update(t *testing.T) {
 	emailAlreadyExists := false
 	genericError := false
 	mockUser := &MockUserService{
-		UpdateFn: func(ctx context.Context, id string, req servicedto.UpdateUserInput, userID string, requesterRole domain.Role) (*domain.User, error) {
+		UpdateFn: func(ctx context.Context, id string, userID string, requesterRole domain.Role, req servicedto.UpdateUserInput) (*domain.User, error) {
 			if id == ID_NOT_FOUND {
 				return nil, domain.ErrUserNotFound
 			}
@@ -408,6 +667,10 @@ func TestUserHandler_Update(t *testing.T) {
 		expects_error bool
 		email_exists  bool
 		generic_error bool
+		requester_id  string
+		requester_num int8
+		role          domain.Role
+		role_num      int8
 	}{
 		{
 			test_name: "Test Ok",
@@ -421,6 +684,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: false,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test ID Not Found",
@@ -434,6 +701,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test No Body",
@@ -445,6 +716,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test Malformed Body",
@@ -456,6 +731,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test No ID",
@@ -468,6 +747,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test update id",
@@ -482,6 +765,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Test Email Already Exists",
@@ -495,6 +782,10 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  true,
 			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
 		},
 		{
 			test_name: "Generic Error",
@@ -508,6 +799,72 @@ func TestUserHandler_Update(t *testing.T) {
 			expects_error: true,
 			email_exists:  false,
 			generic_error: true,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role:          domain.RoleUser,
+			role_num:      0,
+		},
+		{
+			test_name: "Test Missing Requester ID",
+			id:        ID_OK,
+			body: `{
+				"name":"Teste Ok",
+				"email":"email@ok.com",
+				"password":"Pa55w0rd"
+				}
+			`,
+			expects_error: true,
+			email_exists:  false,
+			generic_error: false,
+			role:          domain.RoleUser,
+			role_num:      0,
+		},
+		{
+			test_name: "Test Missing Requester Role",
+			id:        ID_OK,
+			body: `{
+				"name":"Teste Ok",
+				"email":"email@ok.com",
+				"password":"Pa55w0rd"
+				}
+			`,
+			expects_error: true,
+			email_exists:  false,
+			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+		},
+		{
+			test_name: "Test Malformed Requester ID",
+			id:        ID_OK,
+			body: `{
+				"name":"Teste Ok",
+				"email":"email@ok.com",
+				"password":"Pa55w0rd"
+				}
+			`,
+			expects_error: true,
+			email_exists:  false,
+			generic_error: false,
+			requester_num: 123,
+			role:          domain.RoleUser,
+			role_num:      0,
+		},
+		{
+			test_name: "Test Malformed Role",
+			id:        ID_OK,
+			body: `{
+				"name":"Teste Ok",
+				"email":"email@ok.com",
+				"password":"Pa55w0rd"
+				}
+			`,
+			expects_error: true,
+			email_exists:  false,
+			generic_error: false,
+			requester_id:  USER_ID_REGULAR,
+			requester_num: 0,
+			role_num:      123,
 		},
 	}
 
@@ -533,14 +890,29 @@ func TestUserHandler_Update(t *testing.T) {
 				},
 			}
 
+			if tt.requester_id != "" && tt.requester_num == 0 {
+				c.Set("userID", tt.requester_id)
+			}
+
+			if tt.requester_num == 123 {
+				c.Set("userID", tt.requester_num)
+			}
+
+			if tt.role_num == 0 && tt.role != "" {
+				c.Set("role", tt.role)
+			}
+
+			if tt.role_num == 123 {
+				c.Set("role", tt.role_num)
+			}
+
 			handler.Update(c)
 			status := c.Writer.Status()
 
-			if status != 200 && !tt.expects_error {
+			if status != http.StatusOK && !tt.expects_error {
 				t.Errorf("Unexpected error")
 			}
 
 		})
 	}
 }
-*/

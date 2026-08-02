@@ -190,6 +190,12 @@ func (h *UserHandler) GetById(c *gin.Context) {
 	}
 
 	requesterRole, ok := role.(domain.Role)
+	if !ok {
+		log.Printf("Failed to get convert role to Role type")
+		c.JSON(http.StatusForbidden,
+			handlerdto.ErrorResponse{Error: "Forbidden"})
+		return
+	}
 	user, err := h.userService.GetById(c.Request.Context(), param_id, userID, requesterRole)
 
 	if err != nil {

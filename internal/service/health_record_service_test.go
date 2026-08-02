@@ -120,7 +120,9 @@ func TestHealthRecord_GetById(t *testing.T) {
 			if id == idNotFound {
 				return nil, domain.ErrCodeInvalid
 			}
-			return nil, nil
+			return &domain.HealthRecord{
+				UserID: id,
+			}, nil
 		},
 	}
 
@@ -129,22 +131,31 @@ func TestHealthRecord_GetById(t *testing.T) {
 	tests := []struct {
 		name         string
 		id           string
+		requester_id string
 		expect_error bool
 	}{
 		{
 			name:         "Test Ok",
 			id:           idOk,
+			requester_id: idOk,
 			expect_error: false,
 		}, {
 			name:         "ID not found",
 			id:           idNotFound,
+			requester_id: idNotFound,
+			expect_error: true,
+		},
+		{
+			name:         "ID Forbidden",
+			id:           idOk,
+			requester_id: idNotFound,
 			expect_error: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := service.GetByID(context.Background(), tt.id)
+			_, err := service.GetByID(context.Background(), tt.id, tt.requester_id)
 			if tt.expect_error && err == nil {
 				t.Errorf("Expected error")
 			}
@@ -159,7 +170,6 @@ func TestHealthRecord_GetById(t *testing.T) {
 func TestHealthRecord_Update(t *testing.T) {
 	idOk := "3d74927e-0604-4f64-823c-e66a0c84da60"
 	idNotFound := "d8b5f97a-a06b-4d1f-8953-ae478e4ee835"
-	userIdOk := "573f14b1-e1a4-4b59-a5cb-e85f308be79b"
 	valueOk := float64(0.0)
 	notesOK := "Notes OK"
 	healthRecordTypId := "helath_record_typ_id"
@@ -171,7 +181,7 @@ func TestHealthRecord_Update(t *testing.T) {
 			}
 			return &domain.HealthRecord{
 				ID:                 idOk,
-				UserID:             userIdOk,
+				UserID:             idOk,
 				HealthRecordTypeID: healthRecordTypId,
 				Value:              valueOk,
 				RecordedAt:         time.Now(),
@@ -191,6 +201,7 @@ func TestHealthRecord_Update(t *testing.T) {
 		name         string
 		id           string
 		update_input servicedto.HealthRecordUpdateInput
+		requester_id string
 		expect_error bool
 	}{
 		{
@@ -201,6 +212,7 @@ func TestHealthRecord_Update(t *testing.T) {
 				Notes:      &notesOK,
 				RecordedAt: &recordedAt,
 			},
+			requester_id: idOk,
 			expect_error: false,
 		},
 		{
@@ -211,13 +223,14 @@ func TestHealthRecord_Update(t *testing.T) {
 				Notes:      &notesOK,
 				RecordedAt: &recordedAt,
 			},
+			requester_id: idNotFound,
 			expect_error: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := service.Update(context.Background(), tt.id, tt.update_input)
+			err := service.Update(context.Background(), tt.id, tt.update_input, tt.requester_id)
 			if tt.expect_error && err == nil {
 				t.Errorf("Expected error")
 			}
@@ -232,6 +245,7 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 
 	userIdOk := "573f14b1-e1a4-4b59-a5cb-e85f308be79b"
 	userNotFound := "1774ac5a-58e0-4b26-abe8-f1bd0e5fde0b"
+	userIdError := "0612716a-09dc-4b96-a5cc-9cc6277386bd"
 	mockRepo := &MockHealthRecordRepository{
 		ListByUserIDFn: func(ctx context.Context, userId string) ([]*domain.HealthRecord, error) {
 			if userId == userNotFound {
@@ -246,23 +260,32 @@ func TestHealthRecord_ListByUserID(t *testing.T) {
 	tests := []struct {
 		name         string
 		userId       string
+		requester_id string
 		expect_error bool
 	}{
 		{
 			name:         "Test OK",
 			userId:       userIdOk,
+			requester_id: userIdOk,
 			expect_error: false,
 		},
 		{
 			name:         "User not found",
 			userId:       userNotFound,
+			requester_id: userNotFound,
+			expect_error: true,
+		},
+		{
+			name:         "Test OK",
+			userId:       userIdOk,
+			requester_id: userIdError,
 			expect_error: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := service.ListByUserID(context.Background(), tt.userId)
+			_, err := service.ListByUserID(context.Background(), tt.userId, tt.requester_id)
 
 			if tt.expect_error && err == nil {
 				t.Errorf("Error expected")
@@ -285,6 +308,14 @@ func TestHealthRecord_Delete(t *testing.T) {
 			}
 			return nil
 		},
+		GetByIDFn: func(ctx context.Context, id string) (*domain.HealthRecord, error) {
+			if id == idNotFound {
+				return nil, domain.ErrCodeInvalid
+			}
+			return &domain.HealthRecord{
+				UserID: id,
+			}, nil
+		},
 	}
 
 	service := NewHealthRecordService(mockRepo)
@@ -292,23 +323,26 @@ func TestHealthRecord_Delete(t *testing.T) {
 	tests := []struct {
 		name         string
 		id           string
+		requester_id string
 		expect_error bool
 	}{
 		{
 			name:         "Test OK",
 			id:           idOk,
+			requester_id: idOk,
 			expect_error: false,
 		},
 		{
 			name:         "Test OK",
 			id:           idNotFound,
+			requester_id: idNotFound,
 			expect_error: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := service.Delete(context.Background(), tt.id)
+			err := service.Delete(context.Background(), tt.id, tt.requester_id)
 
 			if tt.expect_error && err == nil {
 				t.Errorf("Error expected")

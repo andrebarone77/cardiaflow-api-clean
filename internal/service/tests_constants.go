@@ -1,5 +1,7 @@
 package service
 
+import "github.com/andrebarone77/cardiaflow-api/internal/domain"
+
 const (
 	UUID_NOT_FOUND     = "c21a1e3b-925a-4eeb-af38-5a2945e1693d"
 	UUID_OK            = "a9b7cb29-282f-4d70-96e8-94d987ddc333"
@@ -9,5 +11,10 @@ const (
 
 	CODE_OK      = "code"
 	LONG_CODE    = "longcodelongcodelongcodelongcodelongcodelongcodelongcodelongcodelongcodelongcodelongcodelongcode"
-	INVALID_CODE = "invalid_code"
+	INVALID_CODE = "invalid-code"
+
+	REQUESTER_ID           = "216cc34d-b102-4116-b5fa-0f3c0671f6d4"
+	REQUESTER_DIFFERENT_ID = "21999f9b-e0b1-462f-b277-0b191feae4b7"
+	REQUESTER_ROLE_USER    = domain.RoleUser
+	REQUESTER_ROLE_ADMIN   = domain.RoleAdmin
 )
