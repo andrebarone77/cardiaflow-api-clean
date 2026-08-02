@@ -284,12 +284,13 @@ func (h *UserHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// Update godoc
+// GetById godoc
 //
-// @Summary      Update User by ID
-// @Description  Update a User by its UUID
+// @Summary      Update user by ID
+// @Description  Update a user from its UUID
 // @Tags         Users
 // @Security     BearerAuth
+// @Produce      json
 // @Param        id path string true "User UUID"
 // @Success      200 {object} dto.UserResponse
 // @Failure      404 {object} dto.ErrorResponse

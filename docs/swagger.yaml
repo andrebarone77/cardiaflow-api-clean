@@ -659,13 +659,15 @@ paths:
       tags:
       - Users
     patch:
-      description: Update a User by its UUID
+      description: Update a user from its UUID
       parameters:
       - description: User UUID
         in: path
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -681,7 +683,7 @@ paths:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Update User by ID
+      summary: Update user by ID
       tags:
       - Users
 securityDefinitions:

@@ -817,11 +817,14 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update a User by its UUID",
+                "description": "Update a user from its UUID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Users"
                 ],
-                "summary": "Update User by ID",
+                "summary": "Update user by ID",
                 "parameters": [
                     {
                         "type": "string",
